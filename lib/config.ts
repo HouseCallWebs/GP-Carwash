@@ -119,6 +119,11 @@ export const siteConfig = {
     popular?: boolean
   }[],
 
+  beforeAfterPhotos: [
+    { id: 'headlight', label: 'Headlight Restoration',   beforeSrc: '/gallery/headlight-before.jpg', afterSrc: '/gallery/headlight-after.jpg' },
+    { id: 'mirror',    label: 'Exterior Mirror Detail',  beforeSrc: '/gallery/mirror-before.jpg',    afterSrc: '/gallery/mirror-after.jpg'    },
+  ],
+
   addons: [
     { id: 'odor',      label: 'Odor Treatment (Ozone)',   description: 'Eliminates smoke, pet, and mildew odors at the source.', price: 175 },
     { id: 'headlight', label: 'Headlight Restoration',    description: 'Removes fog and yellowing for clear, bright headlights.', price: 75  },

@@ -32,8 +32,8 @@ export default function GalleryPage() {
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <p className="text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
-              We&apos;ll fill this gallery with real jobs from around Lincoln as they
-              come in. Here&apos;s a preview of how it will look.
+              Drag the sliders to see real results from jobs around Lincoln — more
+              get added after every appointment.
             </p>
           </ScrollReveal>
         </div>

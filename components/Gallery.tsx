@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { siteConfig } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 
 export default function Gallery() {
   return (
@@ -26,13 +27,28 @@ export default function Gallery() {
           </ScrollReveal>
           <ScrollReveal delay={0.15}>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Photos from real jobs will populate this gallery as they come in.
-              Here&apos;s a preview of the layout.
+              Drag the sliders below to see real before &amp; after results. More
+              photos are added after every job.
             </p>
           </ScrollReveal>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {siteConfig.beforeAfterPhotos.map((photo, i) => (
+            <motion.div
+              key={photo.id}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: i * 0.07 }}
+            >
+              <BeforeAfterSlider
+                beforeSrc={photo.beforeSrc}
+                afterSrc={photo.afterSrc}
+                label={photo.label}
+              />
+            </motion.div>
+          ))}
           {siteConfig.galleryItems.map((item, i) => (
             <motion.div
               key={item.label}
@@ -91,7 +107,7 @@ export default function Gallery() {
 
         <ScrollReveal delay={0.3} className="text-center mt-10">
           <p className="text-slate-500 text-sm italic">
-            Photo gallery coming soon — check back after our next round of jobs.
+            More before &amp; after photos coming soon — check back after our next round of jobs.
           </p>
         </ScrollReveal>
       </div>
