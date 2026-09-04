@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Phone, ChevronDown, MapPin, ArrowRight, CheckCircle } from 'lucide-react'
+import { Phone, ChevronDown, MapPin, ArrowRight, CheckCircle, Star } from 'lucide-react'
 import Link from 'next/link'
 import { siteConfig } from '@/lib/config'
 
@@ -38,18 +38,32 @@ export default function Hero() {
 
         <div className="max-w-4xl">
 
-          {/* Badge */}
+          {/* Badges */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border mb-8"
-            style={{ borderColor: 'rgba(255,106,0,0.3)', background: 'rgba(255,106,0,0.07)' }}
+            className="flex flex-wrap items-center gap-3 mb-8"
           >
-            <MapPin className="w-3.5 h-3.5" style={{ color: '#FF8A3D' }} />
-            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#FF8A3D' }}>
-              Lincoln, NE · 35-Mile Service Area
-            </span>
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border"
+              style={{ borderColor: 'rgba(255,106,0,0.3)', background: 'rgba(255,106,0,0.07)' }}>
+              <MapPin className="w-3.5 h-3.5" style={{ color: '#FF8A3D' }} />
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#FF8A3D' }}>
+                Lincoln, NE · 35-Mile Service Area
+              </span>
+            </div>
+
+            {/* Trust badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border"
+              style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="w-3 h-3" style={{ color: '#FF6A00', fill: '#FF6A00' }} />
+                ))}
+              </div>
+              <span className="text-xs font-bold text-white">{siteConfig.reviews.rating}</span>
+              <span className="text-xs text-slate-400">· {siteConfig.reviews.count} Google Reviews</span>
+            </div>
           </motion.div>
 
           {/* Headline */}

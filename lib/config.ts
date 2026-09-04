@@ -20,6 +20,12 @@ export const siteConfig = {
     serviceRadius: 35,
   },
 
+  reviews: {
+    rating:    4.9,
+    count:     '70+',
+    googleUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJidLX1Qm5locRs3wYyFdyrek',
+  },
+
   hours: [
     { day: 'Monday – Friday', time: '8:00 AM – 4:00 PM' },
     { day: 'Saturday',        time: 'By Appointment'     },

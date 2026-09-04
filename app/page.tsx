@@ -5,6 +5,7 @@ import ServiceOverview from '@/components/ServiceOverview'
 import WhyChooseUs     from '@/components/WhyChooseUs'
 import Gallery         from '@/components/Gallery'
 import FinalCTA        from '@/components/FinalCTA'
+import Reviews         from '@/components/Reviews'
 import Footer          from '@/components/Footer'
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
       <WhyChooseUs />
       <Gallery />
       <FinalCTA />
+      <Reviews />
       <Footer />
     </main>
   )
