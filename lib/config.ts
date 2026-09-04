@@ -126,8 +126,10 @@ export const siteConfig = {
   }[],
 
   beforeAfterPhotos: [
-    { id: 'headlight', label: 'Headlight Restoration',   beforeSrc: '/gallery/headlight-before.jpg', afterSrc: '/gallery/headlight-after.jpg' },
-    { id: 'mirror',    label: 'Exterior Mirror Detail',  beforeSrc: '/gallery/mirror-before.jpg',    afterSrc: '/gallery/mirror-after.jpg'    },
+    { id: 'headlight',  label: 'Headlight Restoration',   beforeSrc: '/gallery/headlight-before.jpg',  afterSrc: '/gallery/headlight-after.jpg'  },
+    { id: 'mirror',     label: 'Exterior Mirror Detail',  beforeSrc: '/gallery/mirror-before.jpg',     afterSrc: '/gallery/mirror-after.jpg'     },
+    { id: 'headlight2', label: 'Headlight Restoration',   beforeSrc: '/gallery/headlight2-before.jpg', afterSrc: '/gallery/headlight2-after.jpg' },
+    { id: 'carpet',     label: 'Carpet Shampoo',          beforeSrc: '/gallery/carpet-before.jpg',     afterSrc: '/gallery/carpet-after.jpg'     },
   ],
 
   addons: [
