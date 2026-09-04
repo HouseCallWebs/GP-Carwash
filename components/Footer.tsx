@@ -10,6 +10,7 @@ const quickLinks = [
   { href: '/services', label: 'Services' },
   { href: '/quote',    label: 'Get a Quote' },
   { href: '/gallery',  label: 'Gallery'  },
+  { href: '/reviews',  label: 'Reviews'  },
   { href: '/about',    label: 'About'    },
   { href: '/contact',  label: 'Contact'  },
 ]
@@ -101,7 +102,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3 text-sm">
                 <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#FF6A00' }} strokeWidth={2} />
-                <span className="text-slate-400 leading-relaxed">{siteConfig.company.address.full}</span>
+                <span className="text-slate-400 leading-relaxed">{siteConfig.company.serviceArea}</span>
               </li>
             </ul>
 

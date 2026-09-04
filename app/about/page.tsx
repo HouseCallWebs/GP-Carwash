@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 const values = [
   { icon: Truck,       title: 'Fully Mobile',      body: 'Our equipment travels with us — pressure washer, water tank, vacuums, and detailing supplies. All we need is a parking spot.' },
-  { icon: MapPin,      title: '35-Mile Radius',    body: 'Based at 5901 Fremont Street in Lincoln, we serve homes, offices, and job sites throughout the metro and surrounding communities.' },
+  { icon: MapPin,      title: '35-Mile Radius',    body: 'Based in Lincoln, we serve homes, offices, and job sites throughout the metro and surrounding communities.' },
   { icon: Clock,       title: 'Flexible Hours',    body: 'Weekday appointments Monday through Friday, 8am to 4pm, with Saturday availability by appointment.' },
   { icon: Droplets,    title: 'Every Vehicle Size', body: 'From compact sedans to full-size trucks and 3-row SUVs, our packages are priced by vehicle size so you know exactly what to expect.' },
   { icon: Sparkles,    title: 'Detail-First Approach', body: 'Whether it is a quick exterior wash or a full buff and seal, we take the same care on every vehicle we touch.' },

@@ -8,10 +8,10 @@ import { Phone, Mail, MapPin, Clock, Star } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: `Contact & Booking | ${siteConfig.company.name}`,
-  description: `Reach GP Mobile Car Wash & Detail by phone, email, or the booking form. Serving Lincoln, NE and a 35-mile radius. Located at 5901 Fremont Street, Lincoln, NE 68507.`,
+  description: `Reach GP Mobile Car Wash & Detail by phone, email, or the booking form. Serving Lincoln, NE and a 35-mile radius.`,
 }
 
-const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(siteConfig.company.address.full)}&z=12&output=embed`
+const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(siteConfig.company.serviceArea)}&z=10&output=embed`
 
 export default function ContactPage() {
   return (
@@ -87,8 +87,8 @@ export default function ContactPage() {
                         <MapPin className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
                       </div>
                       <div>
-                        <div className="text-xs text-slate-500 uppercase tracking-wider mb-0.5">Address</div>
-                        <div className="text-slate-300 leading-relaxed">{siteConfig.company.address.full}</div>
+                        <div className="text-xs text-slate-500 uppercase tracking-wider mb-0.5">Service Area</div>
+                        <div className="text-slate-300 leading-relaxed">{siteConfig.company.serviceArea}</div>
                       </div>
                     </div>
                   </div>

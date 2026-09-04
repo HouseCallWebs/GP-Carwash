@@ -7,7 +7,7 @@ const items = [
   { icon: Truck,       label: 'Fully Mobile',      sub: 'We come to you' },
   { icon: MapPin,      label: '35-Mile Radius',    sub: 'Around Lincoln, NE' },
   { icon: Clock,       label: 'Mon – Fri, 8–4',     sub: 'Sat by appointment' },
-  { icon: ShieldCheck, label: 'Locally Based',      sub: '5901 Fremont St, Lincoln' },
+  { icon: ShieldCheck, label: 'Locally Based',      sub: 'Greater Lincoln, Nebraska' },
 ]
 
 export default function TrustStrip() {

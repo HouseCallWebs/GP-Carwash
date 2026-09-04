@@ -10,13 +10,8 @@ export const siteConfig = {
     phone:     '(402) 601-6929',
     phoneHref: 'tel:+14026016929',
     email:     'gpmobilecarwash@gmail.com',
-    address: {
-      street: '5901 Fremont Street',
-      city:   'Lincoln',
-      state:  'NE',
-      zip:    '68507',
-      full:   '5901 Fremont Street, Lincoln, NE 68507',
-    },
+    serviceArea:     'Greater Lincoln, Nebraska',
+    serviceAreaLong: 'Serving Lincoln, NE and surrounding areas',
     serviceRadius: 35,
   },
 
