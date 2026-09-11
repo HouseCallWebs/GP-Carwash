@@ -69,10 +69,6 @@ export default function Footer() {
             <p className="text-slate-400 text-sm leading-relaxed mb-4">
               Proudly serving Lincoln, NE and every community within a 35-mile radius.
             </p>
-            <div className="p-4 rounded-xl bg-white/3 border border-white/5 space-y-1.5 text-xs text-slate-500">
-              <div>License &amp; certification badges</div>
-              <div className="text-slate-600">Coming soon</div>
-            </div>
           </div>
 
           {/* Contact */}

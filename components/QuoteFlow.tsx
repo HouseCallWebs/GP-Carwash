@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import {
   Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle, Store, Truck,
 } from 'lucide-react'
@@ -159,21 +160,35 @@ function EstimateFlow() {
         {/* Step 1 — size */}
         <div>
           <StepLabel n={1} label="Choose Your Vehicle Size" />
+          <p className="text-sm text-slate-500 mb-3">
+            Not sure which category fits? Use the photos below as a guide.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {siteConfig.vehicleSizes.map(s => (
               <button
                 key={s.id}
                 onClick={() => setSize(s.id)}
-                className="text-left p-4 rounded-xl border transition-all"
+                className="text-left rounded-xl border overflow-hidden transition-all"
                 style={size === s.id
                   ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
                   : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-display font-bold text-white uppercase tracking-wide">{s.label}</span>
-                  {size === s.id && <Check className="w-4 h-4" style={{ color: '#FF6A00' }} />}
+                <div className="relative aspect-[4/3] bg-black/20">
+                  <Image
+                    src={s.image}
+                    alt={`${s.label} vehicle size example — ${s.sub}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className="object-contain"
+                  />
                 </div>
-                <div className="text-xs text-slate-500">{s.sub}</div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display font-bold text-white uppercase tracking-wide">{s.label}</span>
+                    {size === s.id && <Check className="w-4 h-4" style={{ color: '#FF6A00' }} />}
+                  </div>
+                  <div className="text-xs text-slate-500">{s.sub}</div>
+                </div>
               </button>
             ))}
           </div>

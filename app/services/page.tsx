@@ -6,7 +6,6 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import { siteConfig } from '@/lib/config'
 import { Check, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: `Services & Pricing | ${siteConfig.company.name}`,
@@ -41,51 +40,6 @@ export default function ServicesPage() {
               <Link href="/quote" className="underline" style={{ color: '#FF8A3D' }}>quote tool</Link>.
             </p>
           </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Vehicle Size Guide */}
-      <section className="py-16 border-b border-white/5" style={{ background: '#0f0f0f' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <ScrollReveal>
-              <span className="badge-accent">Which Size Am I?</span>
-            </ScrollReveal>
-            <ScrollReveal delay={0.1}>
-              <h2 className="font-display font-bold text-3xl text-white uppercase">
-                Find Your <span className="gradient-text-accent">Vehicle Size</span>
-              </h2>
-            </ScrollReveal>
-            <ScrollReveal delay={0.15}>
-              <p className="text-slate-400 mt-3 max-w-xl mx-auto">
-                Every package below is priced by size — use this guide to see
-                which category your vehicle falls under.
-              </p>
-            </ScrollReveal>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {siteConfig.vehicleSizes.map((s, i) => (
-              <ScrollReveal key={s.id} delay={i * 0.08}>
-                <div className="rounded-2xl border border-white/6 bg-card-gradient overflow-hidden h-full">
-                  <div className="relative aspect-[3/2]">
-                    <Image
-                      src={s.image}
-                      alt={`${s.label} vehicle size example — ${s.sub}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-5 text-center">
-                    <div className="font-display font-bold text-lg text-white uppercase tracking-wide">
-                      {s.label}
-                    </div>
-                    <div className="text-sm text-slate-400 mt-1">{s.sub}</div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
         </div>
       </section>
 
