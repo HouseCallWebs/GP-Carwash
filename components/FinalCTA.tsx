@@ -86,7 +86,7 @@ export default function FinalCTA() {
 
         <ScrollReveal delay={0.4}>
           <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-slate-500">
-            {['✓ Instant online pricing', '✓ Mobile — we come to you', '✓ 35-mile service area', '✓ Flexible scheduling'].map(item => (
+            {['✓ Instant online pricing', '✓ Drop off or we come to you', '✓ 35-mile service area', '✓ Flexible scheduling'].map(item => (
               <span key={item} className="font-medium">{item}</span>
             ))}
           </div>

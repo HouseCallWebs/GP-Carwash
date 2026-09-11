@@ -7,7 +7,7 @@ import { siteConfig } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: `Get a Quote | ${siteConfig.company.name}`,
-  description: `Build your instant mobile detailing price by vehicle size and package, or request a custom quote for ceramic coating, fleet washing, or RV & boat detailing.`,
+  description: `Build your instant detailing price by vehicle size and package — drop off at our shop or request mobile service — or request a custom quote for ceramic coating, fleet washing, or RV & boat detailing.`,
 }
 
 export default function QuotePage() {

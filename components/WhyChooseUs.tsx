@@ -1,12 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Truck, MapPin, Clock, Droplets, type LucideIcon } from 'lucide-react'
+import { Truck, MapPin, Clock, Droplets, Store, type LucideIcon } from 'lucide-react'
 import { siteConfig } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
 const iconMap: Record<string, LucideIcon> = {
-  Truck, MapPin, Clock, Droplets,
+  Truck, MapPin, Clock, Droplets, Store,
 }
 
 export default function WhyChooseUs() {
@@ -24,14 +24,14 @@ export default function WhyChooseUs() {
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
             <h2 className="font-display font-bold text-section text-white uppercase mb-5">
-              Detailing That{' '}
-              <span className="gradient-text-accent">Comes to You.</span>
+              Detailing On{' '}
+              <span className="gradient-text-accent">Your Terms.</span>
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={0.15}>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              No drop-off, no waiting room, no second trip. We show up with everything
-              we need and leave your vehicle looking sharp.
+              Drop it off at our shop, or we&apos;ll come to you. Either way, we show
+              up with everything we need and leave your vehicle looking sharp.
             </p>
           </ScrollReveal>
         </div>

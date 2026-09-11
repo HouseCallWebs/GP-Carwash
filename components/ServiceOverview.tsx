@@ -52,10 +52,9 @@ export default function ServiceOverview() {
                 </div>
               )}
               <div className="card-shine flex flex-col h-full p-6 rounded-2xl border border-white/6 bg-card-gradient hover:border-white/12 hover:shadow-card-hover transition-all">
-                <h3 className="font-display font-bold text-lg text-white mb-1 uppercase tracking-wide">
+                <h3 className="font-display font-bold text-lg text-white mb-2 uppercase tracking-wide">
                   {pkg.name}
                 </h3>
-                <div className="text-xs font-semibold mb-4" style={{ color: '#FF8A3D' }}>{pkg.tagline}</div>
                 <div className="w-6 h-0.5 rounded-full mb-4" style={{ background: '#FF6A00' }} />
                 <ul className="space-y-1.5 mb-5 flex-1">
                   {pkg.includes.slice(0, 4).map(item => (

@@ -9,7 +9,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: `Services & Pricing | ${siteConfig.company.name}`,
-  description: `Full pricing for GP Mobile Car Wash & Detail — Basic, Premium, Extreme, Interior Only, and Buffing packages, plus add-ons. Serving Lincoln, NE within a 35-mile radius.`,
+  description: `Full pricing for GP Mobile Car Wash & Detail — Basic, Premium, Extreme, Interior Only, and Buffing packages, plus add-ons. Drop off at our shop or request mobile service across Lincoln, NE and a 35-mile radius.`,
 }
 
 export default function ServicesPage() {
@@ -35,8 +35,10 @@ export default function ServicesPage() {
           <ScrollReveal delay={0.2}>
             <p className="text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
               Pricing is set by vehicle size — Small (sedan/coupe), Medium (2-row SUV
-              or crossover), and Large (van, 3-row SUV, or truck). Pick a package
-              below or build your exact price on our{' '}
+              or crossover), and Large (van, 3-row SUV, or truck). Every price below
+              applies whether you drop off at our shop or request mobile service —
+              same price either way. Pick a package below or build your exact price
+              on our{' '}
               <Link href="/quote" className="underline" style={{ color: '#FF8A3D' }}>quote tool</Link>.
             </p>
           </ScrollReveal>
@@ -62,8 +64,7 @@ export default function ServicesPage() {
                         </span>
                       )}
                     </div>
-                    <div className="text-sm font-semibold mb-4" style={{ color: '#FF8A3D' }}>{pkg.tagline}</div>
-                    <p className="text-slate-400 mb-5">{pkg.description}</p>
+                    <p className="text-slate-400 mb-5 mt-2">{pkg.description}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                       {pkg.includes.map(item => (
                         <div key={item} className="flex items-start gap-2 text-sm text-slate-300">

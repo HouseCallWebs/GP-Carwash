@@ -45,7 +45,6 @@ export const siteConfig = {
     {
       id:          'basic',
       name:        'Basic',
-      tagline:     'Exterior Only',
       description: 'A quick, thorough refresh for the outside of your vehicle.',
       includes: [
         'Exterior wash',
@@ -60,7 +59,6 @@ export const siteConfig = {
     {
       id:          'premium',
       name:        'Premium',
-      tagline:     'Inside & Out',
       description: 'Our most popular package — a full interior and exterior clean.',
       includes: [
         'Exterior wash',
@@ -78,7 +76,6 @@ export const siteConfig = {
     {
       id:          'extreme',
       name:        'Extreme',
-      tagline:     'The Full Detail',
       description: 'The complete top-to-bottom detail, inside and out.',
       includes: [
         'Full interior & exterior detail',
@@ -95,7 +92,6 @@ export const siteConfig = {
     {
       id:          'interior',
       name:        'Interior Only',
-      tagline:     'Cabin Focus',
       description: 'A deep clean for the inside of your vehicle only.',
       includes: [
         'Full interior detail',
@@ -108,7 +104,6 @@ export const siteConfig = {
     {
       id:          'buffing',
       name:        'Buffing',
-      tagline:     '3-Step Buff & Seal',
       description: 'Machine buff and paint sealant for a deep, protected shine.',
       includes: [
         '3-step machine buff',
@@ -121,7 +116,6 @@ export const siteConfig = {
   ] as {
     id: PackageTier
     name: string
-    tagline: string
     description: string
     includes: string[]
     prices: Record<VehicleSize, number>
@@ -148,7 +142,7 @@ export const siteConfig = {
   ],
 
   whyUs: [
-    { icon: 'Truck',    title: 'We Come to You',        body: 'Our fully equipped mobile unit comes straight to your home, office, or job site — no driving, no waiting rooms.' },
+    { icon: 'Store',    title: 'Drop Off or We Come to You', body: 'Bring your vehicle to our shop, or let our fully equipped mobile unit come to your home, office, or job site — your choice, same price.' },
     { icon: 'MapPin',   title: '35-Mile Service Area',   body: 'We serve Lincoln, NE and every community within a 35-mile radius.' },
     { icon: 'Clock',    title: 'Flexible Scheduling',    body: 'Weekday appointments Monday through Friday, plus Saturdays by appointment.' },
     { icon: 'Droplets', title: 'Detail-Focused',         body: 'From a quick exterior wash to a full ceramic coating — we treat every vehicle like our own.' },
@@ -174,9 +168,9 @@ export const siteConfig = {
   },
 
   seo: {
-    title:       'GP Mobile Car Wash & Detail | Lincoln, NE Mobile Detailing',
-    description: 'Mobile car wash and detailing serving Lincoln, NE and a 35-mile radius. We come to you. Wash, detail, buffing, and ceramic coating. Call (402) 601-6929.',
-    keywords:    'mobile car wash Lincoln NE, mobile detailing Lincoln Nebraska, car detailing Lincoln, ceramic coating Lincoln NE, mobile auto detail',
+    title:       'GP Mobile Car Wash & Detail | Lincoln, NE Car Wash & Detailing',
+    description: 'Car wash and detailing serving Lincoln, NE and a 35-mile radius. Drop off at our shop or we come to you. Wash, detail, buffing, and ceramic coating. Call (402) 601-6929.',
+    keywords:    'car wash Lincoln NE, mobile detailing Lincoln Nebraska, car detailing Lincoln, ceramic coating Lincoln NE, drop off car wash Lincoln NE',
   },
 } as const
 

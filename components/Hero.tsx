@@ -98,9 +98,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.65 }}
             className="text-hero-sub text-slate-300 max-w-2xl mb-10"
           >
-            Full-service mobile detailing that comes straight to your driveway, office
-            parking lot, or job site. Wash, detail, buffing, and ceramic coating —
-            booked in minutes, done without you lifting a finger.
+            Drop your vehicle off at our shop, or let us come straight to your
+            driveway, office, or job site — your choice, same price. Wash, detail,
+            buffing, and ceramic coating, booked in minutes.
           </motion.p>
 
           {/* CTAs */}
@@ -129,7 +129,7 @@ export default function Hero() {
           >
             <span className="flex items-center gap-2 text-sm text-slate-400">
               <CheckCircle className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
-              We come to you — no drop-off required
+              Drop off at our shop, or we come to you
             </span>
             <span className="flex items-center gap-2 text-sm text-slate-400">
               <CheckCircle className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />

@@ -75,12 +75,16 @@ export default function QuoteFlow() {
 /*  Instant Price Estimate                                              */
 /* ─────────────────────────────────────────────────────────────────── */
 
+const optionalAddons = siteConfig.addons.filter(a => a.id !== 'pethair')
+const petHairFee = siteConfig.addons.find(a => a.id === 'pethair')?.price ?? 0
+
 function EstimateFlow() {
   const [size, setSize]     = useState<VehicleSize | null>(null)
   const [pkg, setPkg]       = useState<PackageTier | null>(null)
+  const [petHair, setPetHair] = useState<boolean | null>(null)
   const [addonIds, setAddonIds] = useState<string[]>([])
   const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null)
-  const [form, setForm]     = useState({ name: '', email: '', phone: '', address: '', notes: '' })
+  const [form, setForm]     = useState({ name: '', email: '', phone: '', address: '', vehicleColor: '', licensePlate: '', notes: '' })
   const [status, setStatus] = useState<Status>('idle')
 
   const basePrice = size && pkg ? getPrice(pkg, size) : 0
@@ -91,8 +95,8 @@ function EstimateFlow() {
     }, 0),
     [addonIds],
   )
-  const total = basePrice + addonsTotal
-  const canSubmit = !!size && !!pkg && !!fulfillment && !!form.name && !!form.email
+  const total = basePrice + addonsTotal + (petHair ? petHairFee : 0)
+  const canSubmit = !!size && !!pkg && petHair !== null && !!fulfillment && !!form.name && !!form.email
 
   function toggleAddon(id: string) {
     setAddonIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -104,7 +108,7 @@ function EstimateFlow() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!size || !pkg || !fulfillment) return
+    if (!size || !pkg || petHair === null || !fulfillment) return
     setStatus('loading')
     try {
       const pkgObj  = siteConfig.packages.find(p => p.id === pkg)!
@@ -120,6 +124,7 @@ function EstimateFlow() {
           type: 'estimate',
           size: sizeObj.label,
           pkg:  pkgObj.name,
+          petHair: petHair ? 'Yes' : 'No',
           addons: addonLabels,
           fulfillment: fulfillmentObj.label,
           total,
@@ -219,11 +224,10 @@ function EstimateFlow() {
                       Popular
                     </span>
                   )}
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="font-display font-bold text-white uppercase tracking-wide">{p.name}</span>
                     {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
                   </div>
-                  <div className="text-xs text-slate-500 mb-2">{p.tagline}</div>
                   <div className="font-display font-bold text-lg" style={{ color: price ? '#FF8A3D' : '#475569' }}>
                     {price ? `$${price}` : 'Select size'}
                   </div>
@@ -233,11 +237,40 @@ function EstimateFlow() {
           </div>
         </div>
 
-        {/* Step 3 — add-ons */}
+        {/* Step 3 — pet hair */}
         <div>
-          <StepLabel n={3} label="Add Optional Extras" />
+          <StepLabel n={3} label="Is There Pet Hair in the Vehicle?" />
+          <div className="grid grid-cols-2 gap-3">
+            {([
+              { value: true,  label: 'Yes', sub: `Adds a $${petHairFee} pet hair removal fee` },
+              { value: false, label: 'No',  sub: 'No pet hair to remove' },
+            ] as const).map(opt => {
+              const selected = petHair === opt.value
+              return (
+                <button
+                  key={opt.label}
+                  onClick={() => setPetHair(opt.value)}
+                  className="text-left p-4 rounded-xl border transition-all"
+                  style={selected
+                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display font-bold text-white uppercase tracking-wide">{opt.label}</span>
+                    {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
+                  </div>
+                  <div className="text-xs text-slate-500">{opt.sub}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Step 4 — add-ons */}
+        <div>
+          <StepLabel n={4} label="Add Optional Extras" />
           <div className="space-y-3">
-            {siteConfig.addons.map(a => {
+            {optionalAddons.map(a => {
               const checked = addonIds.includes(a.id)
               return (
                 <button
@@ -267,9 +300,9 @@ function EstimateFlow() {
           </div>
         </div>
 
-        {/* Step 4 — drop off or mobile */}
+        {/* Step 5 — drop off or mobile */}
         <div>
-          <StepLabel n={4} label="Drop Off or We Come to You" />
+          <StepLabel n={5} label="Drop Off or We Come to You" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {fulfillmentOptions.map(f => {
               const selected = fulfillment === f.id
@@ -298,9 +331,9 @@ function EstimateFlow() {
           </div>
         </div>
 
-        {/* Step 5 — contact */}
+        {/* Step 6 — contact */}
         <div>
-          <StepLabel n={5} label="Your Contact Info" />
+          <StepLabel n={6} label="Your Contact Info" />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -334,6 +367,18 @@ function EstimateFlow() {
                   placeholder="Where should we meet you?" className={inputClass} style={inputStyle} />
               </div>
             )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Vehicle Color</label>
+                <input name="vehicleColor" value={form.vehicleColor} onChange={handleFormChange}
+                  placeholder="e.g. Silver" className={inputClass} style={inputStyle} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">License Plate</label>
+                <input name="licensePlate" value={form.licensePlate} onChange={handleFormChange}
+                  placeholder="e.g. ABC-1234" className={inputClass} style={inputStyle} />
+              </div>
+            </div>
             <div>
               <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Notes</label>
               <textarea name="notes" rows={3} value={form.notes} onChange={handleFormChange}
@@ -359,7 +404,8 @@ function EstimateFlow() {
             </button>
             {!canSubmit && (
               <p className="text-xs text-slate-500 text-center">
-                Select a size, a package, a drop-off or mobile option, and enter your name &amp; email to book.
+                Select a size, a package, answer the pet hair question, choose a
+                drop-off or mobile option, and enter your name &amp; email to book.
               </p>
             )}
           </form>
@@ -378,6 +424,12 @@ function EstimateFlow() {
             <SummaryRow label="Vehicle Size" value={size ? siteConfig.vehicleSizes.find(s => s.id === size)!.label : '—'} />
             <SummaryRow label="Package" value={pkg ? siteConfig.packages.find(p => p.id === pkg)!.name : '—'} />
             <SummaryRow label="Service Type" value={fulfillment ? fulfillmentOptions.find(f => f.id === fulfillment)!.label : '—'} />
+            {petHair !== null && (
+              <div className="flex justify-between text-xs text-slate-400 pt-2 border-t border-white/5">
+                <span>Pet Hair in Vehicle</span>
+                <span>{petHair ? `Yes (+$${petHairFee})` : 'No'}</span>
+              </div>
+            )}
             {addonIds.length > 0 && (
               <div className="pt-2 border-t border-white/5">
                 {addonIds.map(id => {

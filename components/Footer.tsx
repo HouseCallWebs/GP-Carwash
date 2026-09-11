@@ -30,8 +30,8 @@ export default function Footer() {
               <Logo className="h-16 w-auto" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
-              Fully mobile car wash and detailing serving Lincoln, NE and a 35-mile
-              radius. We bring the equipment to you — home, office, or job site.
+              Car wash and detailing serving Lincoln, NE and a 35-mile radius.
+              Drop off at our shop, or we&apos;ll bring the equipment to you.
             </p>
             <SocialLinks
               itemClassName="w-9 h-9 rounded-lg border border-white/10 bg-white/3 flex items-center justify-center text-slate-400 hover:text-[#FF6A00] hover:border-[#FF6A00]/40 transition-colors"

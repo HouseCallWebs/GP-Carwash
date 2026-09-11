@@ -1,10 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Truck, MapPin, Clock, ShieldCheck } from 'lucide-react'
+import { Store, MapPin, Clock, ShieldCheck } from 'lucide-react'
 
 const items = [
-  { icon: Truck,       label: 'Fully Mobile',      sub: 'We come to you' },
+  { icon: Store,       label: 'Drop Off or Mobile', sub: 'Your choice, same price' },
   { icon: MapPin,      label: '35-Mile Radius',    sub: 'Around Lincoln, NE' },
   { icon: Clock,       label: 'Mon – Fri, 8–4',     sub: 'Sat by appointment' },
   { icon: ShieldCheck, label: 'Locally Based',      sub: 'Greater Lincoln, Nebraska' },
