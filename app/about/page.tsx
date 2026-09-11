@@ -26,7 +26,7 @@ export default function AboutPage() {
       <Navigation />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden"
+      <section className="relative pt-40 pb-20 overflow-hidden"
         style={{ background: 'linear-gradient(180deg, #0e0e0e 0%, #0a0a0a 100%)' }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-3xl pointer-events-none"
           style={{ background: 'rgba(255,106,0,0.05)' }} />

@@ -34,7 +34,7 @@ export default function Hero() {
         style={{ background: 'linear-gradient(to bottom, transparent, #FF6A00, transparent)' }} />
 
       <motion.div style={{ y: contentY, opacity: contentOpacity }}
-        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 w-full">
+        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-20 w-full">
 
         <div className="max-w-4xl">
 

@@ -1,8 +1,9 @@
 'use client'
 
-import { Phone, Mail, MapPin, Facebook, ExternalLink } from 'lucide-react'
+import { Phone, Mail, MapPin, Gift } from 'lucide-react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import SocialLinks from '@/components/SocialLinks'
 import { siteConfig } from '@/lib/config'
 
 const quickLinks = [
@@ -32,17 +33,16 @@ export default function Footer() {
               Fully mobile car wash and detailing serving Lincoln, NE and a 35-mile
               radius. We bring the equipment to you — home, office, or job site.
             </p>
-            <div className="flex items-center gap-3">
-              {[
-                { href: siteConfig.social.facebook, Icon: Facebook,     label: 'Facebook' },
-                { href: siteConfig.social.google,   Icon: ExternalLink, label: 'Google'   },
-              ].map(({ href, Icon, label }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className="w-9 h-9 rounded-lg border border-white/10 bg-white/3 flex items-center justify-center text-slate-400 hover:text-white transition-all">
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
+            <SocialLinks
+              itemClassName="w-9 h-9 rounded-lg border border-white/10 bg-white/3 flex items-center justify-center text-slate-400 hover:text-[#FF6A00] hover:border-[#FF6A00]/40 transition-colors"
+              iconClassName="w-4 h-4"
+              className="flex items-center gap-3 mb-5"
+            />
+            <a href={siteConfig.company.giftCardUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-[#FF8A3D] transition-colors">
+              <Gift className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
+              Buy a Gift Card
+            </a>
           </div>
 
           {/* Quick links */}
@@ -102,7 +102,11 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3 text-sm">
                 <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#FF6A00' }} strokeWidth={2} />
-                <span className="text-slate-400 leading-relaxed">{siteConfig.company.serviceArea}</span>
+                <div>
+                  <div className="text-slate-300 leading-relaxed">{siteConfig.company.address.full}</div>
+                  <div className="text-slate-500 text-xs mt-0.5">Drop off at our shop, or we&apos;ll come to you</div>
+                  <div className="text-slate-600 text-xs mt-1.5">{siteConfig.company.serviceArea}</div>
+                </div>
               </li>
             </ul>
 

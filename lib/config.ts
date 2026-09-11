@@ -13,6 +13,14 @@ export const siteConfig = {
     serviceArea:     'Greater Lincoln, Nebraska',
     serviceAreaLong: 'Serving Lincoln, NE and surrounding areas',
     serviceRadius: 35,
+    address: {
+      street: '5901 Fremont Street',
+      city:   'Lincoln',
+      state:  'NE',
+      zip:    '68507',
+      full:   '5901 Fremont Street, Lincoln, NE 68507',
+    },
+    giftCardUrl: 'https://squareup.com/gift/HQDD559P065DH/order',
   },
 
   reviews: {
@@ -28,10 +36,10 @@ export const siteConfig = {
   ],
 
   vehicleSizes: [
-    { id: 'small',  label: 'Small',  sub: 'Sedan, coupe, hatchback' },
-    { id: 'medium', label: 'Medium', sub: '2-Row SUV or crossover'  },
-    { id: 'large',  label: 'Large',  sub: 'Van, 3-Row SUV, or truck' },
-  ] as { id: VehicleSize; label: string; sub: string }[],
+    { id: 'small',  label: 'Small',  sub: 'Sedan, coupe, hatchback',  image: '/vehicle-sizes/small.jpg'  },
+    { id: 'medium', label: 'Medium', sub: '2-Row SUV or crossover',   image: '/vehicle-sizes/medium.jpg' },
+    { id: 'large',  label: 'Large',  sub: 'Van, 3-Row SUV, or truck', image: '/vehicle-sizes/large.jpg'  },
+  ] as { id: VehicleSize; label: string; sub: string; image: string }[],
 
   packages: [
     {
@@ -156,7 +164,12 @@ export const siteConfig = {
   ],
 
   social: {
-    facebook:  'https://facebook.com',
+    facebook:  'https://www.facebook.com/GPMobileCarWash1/',
+    instagram: 'https://www.instagram.com/gpmobilecarwash',
+    tiktok:    'https://www.tiktok.com/@gpmobilecardetail',
+    youtube:   'https://www.youtube.com/@mobilecarwash1',
+    x:         'https://x.com/gpmobilecarwash',
+    linkedin:  'https://www.linkedin.com/in/nelson-orellana-5264a532/',
     google:    'https://google.com',
   },
 

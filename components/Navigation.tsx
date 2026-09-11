@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, Menu, X } from 'lucide-react'
+import { Phone, Menu, X, Gift } from 'lucide-react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import SocialLinks from '@/components/SocialLinks'
 import { siteConfig } from '@/lib/config'
 
 const navLinks = [
@@ -32,6 +33,20 @@ export default function Navigation() {
         ? 'bg-dark-900/96 backdrop-blur-md border-b border-white/6 shadow-[0_4px_30px_rgba(0,0,0,0.7)]'
         : 'bg-dark-900/40 backdrop-blur-sm'
     }`}>
+      {/* Utility topbar */}
+      <div className="border-b border-white/5" style={{ background: 'rgba(0,0,0,0.35)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-8">
+            <SocialLinks />
+            <a href={siteConfig.company.giftCardUrl} target="_blank" rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-[#FF8A3D] transition-colors">
+              <Gift className="w-3.5 h-3.5" style={{ color: '#FF6A00' }} strokeWidth={2} />
+              Buy a Gift Card
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
 
@@ -96,6 +111,12 @@ export default function Navigation() {
                   {l.label}
                 </Link>
               ))}
+              <a href={siteConfig.company.giftCardUrl} target="_blank" rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
+                <Gift className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
+                Buy a Gift Card
+              </a>
               <div className="pt-3 border-t border-white/6 mt-3">
                 <a href={siteConfig.company.phoneHref} className="btn-orange w-full py-3 text-sm">
                   <Phone className="w-4 h-4" strokeWidth={2} />

@@ -15,7 +15,7 @@ export default function QuotePage() {
     <main className="min-h-screen" style={{ background: '#0a0a0a' }}>
       <Navigation />
 
-      <section className="relative pt-32 pb-24 overflow-hidden">
+      <section className="relative pt-40 pb-24 overflow-hidden">
         <div className="absolute inset-0 diagonal-texture opacity-40" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] rounded-full blur-3xl pointer-events-none"
           style={{ background: 'rgba(255,106,0,0.06)' }} />

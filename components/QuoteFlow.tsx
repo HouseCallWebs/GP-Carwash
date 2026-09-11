@@ -3,13 +3,19 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle,
+  Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle, Store, Truck,
 } from 'lucide-react'
 import { siteConfig, getPrice, type VehicleSize, type PackageTier } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
 type Mode = 'estimate' | 'custom'
 type Status = 'idle' | 'loading' | 'success' | 'error'
+type Fulfillment = 'dropoff' | 'mobile'
+
+const fulfillmentOptions: { id: Fulfillment; label: string; sub: string; icon: typeof Store }[] = [
+  { id: 'dropoff', label: 'Drop Off at Our Shop', sub: siteConfig.company.address.full, icon: Store },
+  { id: 'mobile',  label: 'We Come to You',       sub: 'We bring the equipment to your location', icon: Truck },
+]
 
 const inputStyle = { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }
 const inputClass = 'w-full px-4 py-3 rounded-xl border text-white text-sm placeholder-slate-500 outline-none transition-all focus:border-[#FF6A00]/50 focus:shadow-[0_0_0_2px_rgba(255,106,0,0.12)]'
@@ -72,6 +78,7 @@ function EstimateFlow() {
   const [size, setSize]     = useState<VehicleSize | null>(null)
   const [pkg, setPkg]       = useState<PackageTier | null>(null)
   const [addonIds, setAddonIds] = useState<string[]>([])
+  const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null)
   const [form, setForm]     = useState({ name: '', email: '', phone: '', address: '', notes: '' })
   const [status, setStatus] = useState<Status>('idle')
 
@@ -84,7 +91,7 @@ function EstimateFlow() {
     [addonIds],
   )
   const total = basePrice + addonsTotal
-  const canSubmit = !!size && !!pkg && !!form.name && !!form.email
+  const canSubmit = !!size && !!pkg && !!fulfillment && !!form.name && !!form.email
 
   function toggleAddon(id: string) {
     setAddonIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -96,12 +103,14 @@ function EstimateFlow() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!size || !pkg) return
+    if (!size || !pkg || !fulfillment) return
     setStatus('loading')
     try {
       const pkgObj  = siteConfig.packages.find(p => p.id === pkg)!
       const sizeObj = siteConfig.vehicleSizes.find(s => s.id === size)!
       const addonLabels = addonIds.map(id => siteConfig.addons.find(a => a.id === id)!.label)
+      const fulfillmentObj = fulfillmentOptions.find(f => f.id === fulfillment)!
+      const address = fulfillment === 'dropoff' ? siteConfig.company.address.full : form.address
 
       const res = await fetch('/api/quote', {
         method:  'POST',
@@ -111,8 +120,10 @@ function EstimateFlow() {
           size: sizeObj.label,
           pkg:  pkgObj.name,
           addons: addonLabels,
+          fulfillment: fulfillmentObj.label,
           total,
           ...form,
+          address,
         }),
       })
       if (!res.ok) throw new Error()
@@ -241,9 +252,40 @@ function EstimateFlow() {
           </div>
         </div>
 
-        {/* Step 4 — contact */}
+        {/* Step 4 — drop off or mobile */}
         <div>
-          <StepLabel n={4} label="Your Contact Info" />
+          <StepLabel n={4} label="Drop Off or We Come to You" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {fulfillmentOptions.map(f => {
+              const selected = fulfillment === f.id
+              const Icon = f.icon
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setFulfillment(f.id)}
+                  className="text-left p-4 rounded-xl border transition-all"
+                  style={selected
+                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(255,106,0,0.1)', border: '1px solid rgba(255,106,0,0.15)' }}>
+                      <Icon className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
+                    </div>
+                    {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
+                  </div>
+                  <div className="font-display font-bold text-white uppercase tracking-wide mb-1">{f.label}</div>
+                  <div className="text-xs text-slate-500">{f.sub}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Step 5 — contact */}
+        <div>
+          <StepLabel n={5} label="Your Contact Info" />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -262,11 +304,21 @@ function EstimateFlow() {
               <input name="email" type="email" required value={form.email} onChange={handleFormChange}
                 placeholder="jane@email.com" className={inputClass} style={inputStyle} />
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Service Address</label>
-              <input name="address" value={form.address} onChange={handleFormChange}
-                placeholder="Where should we meet you?" className={inputClass} style={inputStyle} />
-            </div>
+            {fulfillment === 'dropoff' ? (
+              <div className="p-3 rounded-xl text-sm flex items-start gap-2.5"
+                style={{ background: 'rgba(255,106,0,0.05)', border: '1px solid rgba(255,106,0,0.12)' }}>
+                <Store className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#FF6A00' }} strokeWidth={2} />
+                <span className="text-slate-300">
+                  You&apos;ll drop off at our shop — {siteConfig.company.address.full}
+                </span>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Service Address</label>
+                <input name="address" value={form.address} onChange={handleFormChange}
+                  placeholder="Where should we meet you?" className={inputClass} style={inputStyle} />
+              </div>
+            )}
             <div>
               <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Notes</label>
               <textarea name="notes" rows={3} value={form.notes} onChange={handleFormChange}
@@ -292,7 +344,7 @@ function EstimateFlow() {
             </button>
             {!canSubmit && (
               <p className="text-xs text-slate-500 text-center">
-                Select a size, a package, and enter your name &amp; email to book.
+                Select a size, a package, a drop-off or mobile option, and enter your name &amp; email to book.
               </p>
             )}
           </form>
@@ -310,6 +362,7 @@ function EstimateFlow() {
           <div className="space-y-3 mb-5 text-sm">
             <SummaryRow label="Vehicle Size" value={size ? siteConfig.vehicleSizes.find(s => s.id === size)!.label : '—'} />
             <SummaryRow label="Package" value={pkg ? siteConfig.packages.find(p => p.id === pkg)!.name : '—'} />
+            <SummaryRow label="Service Type" value={fulfillment ? fulfillmentOptions.find(f => f.id === fulfillment)!.label : '—'} />
             {addonIds.length > 0 && (
               <div className="pt-2 border-t border-white/5">
                 {addonIds.map(id => {

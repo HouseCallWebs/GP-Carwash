@@ -8,17 +8,17 @@ import { Phone, Mail, MapPin, Clock, Star } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: `Contact & Booking | ${siteConfig.company.name}`,
-  description: `Reach GP Mobile Car Wash & Detail by phone, email, or the booking form. Serving Lincoln, NE and a 35-mile radius.`,
+  description: `Reach GP Mobile Car Wash & Detail by phone, email, or the booking form. Drop off at our shop at ${siteConfig.company.address.full} or request mobile service anywhere in Greater Lincoln, Nebraska.`,
 }
 
-const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(siteConfig.company.serviceArea)}&z=10&output=embed`
+const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(siteConfig.company.address.full)}&z=13&output=embed`
 
 export default function ContactPage() {
   return (
     <main className="min-h-screen" style={{ background: '#0a0a0a' }}>
       <Navigation />
 
-      <section className="relative pt-32 pb-24 overflow-hidden">
+      <section className="relative pt-40 pb-24 overflow-hidden">
         <div className="absolute inset-0 diagonal-texture opacity-40" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-3xl pointer-events-none"
           style={{ background: 'rgba(255,106,0,0.05)' }} />
@@ -87,8 +87,11 @@ export default function ContactPage() {
                         <MapPin className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
                       </div>
                       <div>
-                        <div className="text-xs text-slate-500 uppercase tracking-wider mb-0.5">Service Area</div>
-                        <div className="text-slate-300 leading-relaxed">{siteConfig.company.serviceArea}</div>
+                        <div className="text-xs text-slate-500 uppercase tracking-wider mb-0.5">Shop Address</div>
+                        <div className="text-slate-300 leading-relaxed">{siteConfig.company.address.full}</div>
+                        <div className="text-slate-500 text-xs mt-1">
+                          Drop off at our shop, or request mobile service — {siteConfig.company.serviceArea}
+                        </div>
                       </div>
                     </div>
                   </div>
