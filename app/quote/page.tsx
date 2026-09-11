@@ -7,7 +7,7 @@ import { siteConfig } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: `Get a Quote | ${siteConfig.company.name}`,
-  description: `Build your instant detailing price by vehicle size and package — drop off at our shop or request mobile service — or request a custom quote for ceramic coating, fleet washing, or RV & boat detailing.`,
+  description: `Build your instant detailing price by vehicle size and package, get real per-foot pricing for RV & boat detailing, or request a custom quote for ceramic coating and fleet washing.`,
 }
 
 export default function QuotePage() {
@@ -33,8 +33,9 @@ export default function QuotePage() {
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
               <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-                Pick your vehicle size and package to see live pricing, or jump to a
-                custom quote for ceramic coating, fleet washing, or RV &amp; boat detailing.
+                Pick your vehicle size and package for instant pricing, calculate
+                your RV or boat detail by the foot, or request a custom quote for
+                ceramic coating and fleet washing.
               </p>
             </ScrollReveal>
           </div>

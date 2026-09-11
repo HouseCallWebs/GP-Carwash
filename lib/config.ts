@@ -136,10 +136,101 @@ export const siteConfig = {
   ],
 
   quoteOnlyServices: [
-    { id: 'ceramic', name: 'Ceramic Coating',    description: 'Long-term paint protection with a high-gloss, hydrophobic finish.' },
-    { id: 'fleet',   name: 'Fleet Washing',      description: 'Recurring wash & detail service for business and fleet vehicles.' },
-    { id: 'rvboat',  name: 'RV & Boat Detailing', description: 'Full interior and exterior detailing sized for RVs and boats.' },
+    { id: 'ceramic', name: 'Ceramic Coating', description: 'Long-term paint protection with a high-gloss, hydrophobic finish.' },
+    { id: 'fleet',   name: 'Fleet Washing',   description: 'Recurring wash & detail service for business and fleet vehicles.' },
   ],
+
+  rvBoatPackages: {
+    boat: [
+      {
+        id:           'boat-basic',
+        name:         'Boat Basic Wash & Vacuum',
+        pricePerFoot: 15,
+        image:        '/rv-boat/boat-basic.jpg',
+        includes: [
+          'Hand Wash and Dry Exterior',
+          'Clean Windows and Mirrors',
+          'Vacuum Carpet and Seats',
+          'Dust Cockpit',
+          'Clean Interior Surface Area',
+        ],
+      },
+      {
+        id:           'boat-interior',
+        name:         'Boat Interior Detail & Wash',
+        pricePerFoot: 25,
+        image:        '/rv-boat/boat-interior.jpg',
+        includes: [
+          'Hand Wash and Dry Exterior',
+          'Clean Windows and Mirrors',
+          'Vacuum Carpet and Seats',
+          'Dust Cockpit, Dash',
+          'Clean Interior Surface Area',
+          'Hand Wax',
+        ],
+      },
+      {
+        id:           'boat-extreme',
+        name:         'Boat Extreme Detail',
+        pricePerFoot: 30,
+        image:        '/rv-boat/boat-extreme.jpg',
+        includes: [
+          'Hand Wash and Dry Exterior',
+          'Hand Wax Exterior',
+          'Clean Windows and Mirrors',
+          'Clean and Dress Trim',
+          'Vacuum and Shampoo Carpet and Seats',
+          'Dust Cockpit, Dash',
+          'Clean Interior Area',
+        ],
+      },
+    ],
+    rv: [
+      {
+        id:           'rv-wash',
+        name:         'RV Wash',
+        pricePerFoot: 15,
+        image:        '/rv-boat/rv-wash.jpg',
+        includes: [
+          'Wash and Dry Exterior',
+          'Detail Mirrors',
+          'Remove Bugs',
+          'Clean and Dress Tires',
+        ],
+      },
+      {
+        id:           'rv-wash-wax',
+        name:         'RV Wash and Wax',
+        pricePerFoot: 25,
+        image:        '/rv-boat/rv-wash-wax.jpg',
+        includes: [
+          'Wash and Dry Exterior',
+          'Detail Mirrors',
+          'Remove Bugs',
+          'Detail Rims',
+          'Clean and Dress Tires',
+          'Apply Wax',
+        ],
+      },
+      {
+        id:           'rv-exterior',
+        name:         'RV Exterior Detail',
+        pricePerFoot: 30,
+        image:        '/rv-boat/rv-exterior.jpg',
+        includes: [
+          'Wash and Dry Exterior',
+          'Detail Mirrors',
+          'Clean Exterior Windows',
+          'Remove Bugs',
+          'Detail Rims',
+          'Clean and Dress Tires',
+          'Remove Oxidation',
+          'Apply Wax',
+          'Over 7 Hours of Work',
+        ],
+      },
+    ],
+  },
 
   whyUs: [
     { icon: 'Store',    title: 'Drop Off or We Come to You', body: 'Bring your vehicle to our shop, or let our fully equipped mobile unit come to your home, office, or job site — your choice, same price.' },
@@ -177,4 +268,12 @@ export const siteConfig = {
 export function getPrice(tier: PackageTier, size: VehicleSize): number {
   const pkg = siteConfig.packages.find(p => p.id === tier)
   return pkg ? pkg.prices[size] : 0
+}
+
+export type RvBoatCategory = 'boat' | 'rv'
+export type RvBoatPackage  = (typeof siteConfig.rvBoatPackages)['boat'][number]
+
+export function getRvBoatTotal(pricePerFoot: number, lengthFeet: number): number {
+  if (!lengthFeet || lengthFeet <= 0) return 0
+  return Math.round(pricePerFoot * lengthFeet)
 }

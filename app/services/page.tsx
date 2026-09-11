@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import FinalCTA from '@/components/FinalCTA'
+import RvBoatSection from '@/components/RvBoatSection'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import { siteConfig } from '@/lib/config'
 import { Check, ArrowRight } from 'lucide-react'
@@ -141,7 +142,7 @@ export default function ServicesPage() {
               </p>
             </ScrollReveal>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
             {siteConfig.quoteOnlyServices.map((s, i) => (
               <ScrollReveal key={s.id} delay={i * 0.08}>
                 <div className="p-6 rounded-2xl border h-full flex flex-col"
@@ -157,6 +158,8 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+
+      <RvBoatSection />
 
       <FinalCTA />
       <Footer />

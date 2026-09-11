@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import {
   Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle, Store, Truck,
+  Anchor, Caravan,
 } from 'lucide-react'
-import { siteConfig, getPrice, type VehicleSize, type PackageTier } from '@/lib/config'
+import { siteConfig, getPrice, getRvBoatTotal, type VehicleSize, type PackageTier, type RvBoatCategory } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
-type Mode = 'estimate' | 'custom'
+type Mode = 'estimate' | 'rvboat' | 'custom'
 type Status = 'idle' | 'loading' | 'success' | 'error'
 type Fulfillment = 'dropoff' | 'mobile'
 
@@ -28,7 +29,7 @@ export default function QuoteFlow() {
     <div>
       {/* Mode toggle */}
       <ScrollReveal>
-        <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-14">
+        <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-14">
           <button
             onClick={() => setMode('estimate')}
             className={`flex-1 flex items-center justify-center gap-2 px-5 py-4 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all ${
@@ -42,6 +43,18 @@ export default function QuoteFlow() {
             Instant Price Estimate
           </button>
           <button
+            onClick={() => setMode('rvboat')}
+            className={`flex-1 flex items-center justify-center gap-2 px-5 py-4 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all ${
+              mode === 'rvboat' ? 'text-black' : 'text-slate-300 hover:text-white'
+            }`}
+            style={mode === 'rvboat'
+              ? { background: '#FF6A00', borderColor: '#FF6A00' }
+              : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
+          >
+            <Anchor className="w-4 h-4" />
+            RV &amp; Boat Detailing
+          </button>
+          <button
             onClick={() => setMode('custom')}
             className={`flex-1 flex items-center justify-center gap-2 px-5 py-4 rounded-xl border text-sm font-bold uppercase tracking-wide transition-all ${
               mode === 'custom' ? 'text-black' : 'text-slate-300 hover:text-white'
@@ -51,7 +64,7 @@ export default function QuoteFlow() {
               : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
           >
             <HelpCircle className="w-4 h-4" />
-            Ceramic, Fleet, RV &amp; More
+            Ceramic, Fleet &amp; More
           </button>
         </div>
       </ScrollReveal>
@@ -60,6 +73,10 @@ export default function QuoteFlow() {
         {mode === 'estimate' ? (
           <motion.div key="estimate" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }}>
             <EstimateFlow />
+          </motion.div>
+        ) : mode === 'rvboat' ? (
+          <motion.div key="rvboat" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }}>
+            <RvBoatFlow />
           </motion.div>
         ) : (
           <motion.div key="custom" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }}>
@@ -467,6 +484,258 @@ function EstimateFlow() {
   )
 }
 
+/* ─────────────────────────────────────────────────────────────────── */
+/*  RV & Boat Detailing — priced per foot                              */
+/* ─────────────────────────────────────────────────────────────────── */
+
+const rvBoatCategories: { id: RvBoatCategory; label: string; icon: typeof Anchor }[] = [
+  { id: 'boat', label: 'Boat', icon: Anchor },
+  { id: 'rv',   label: 'RV',   icon: Caravan },
+]
+
+function RvBoatFlow() {
+  const [category, setCategory] = useState<RvBoatCategory | null>(null)
+  const [pkgId, setPkgId]       = useState<string | null>(null)
+  const [length, setLength]     = useState('')
+  const [form, setForm]         = useState({ name: '', email: '', phone: '', address: '', notes: '' })
+  const [status, setStatus]     = useState<Status>('idle')
+
+  const lengthFeet = parseFloat(length) || 0
+  const packages   = category ? siteConfig.rvBoatPackages[category] : []
+  const selectedPkg = packages.find(p => p.id === pkgId) ?? null
+  const total = selectedPkg ? getRvBoatTotal(selectedPkg.pricePerFoot, lengthFeet) : 0
+  const canSubmit = !!category && !!selectedPkg && lengthFeet > 0 && !!form.name && !!form.email
+
+  function handleFormChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  function selectCategory(c: RvBoatCategory) {
+    setCategory(c)
+    setPkgId(null)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!category || !selectedPkg || lengthFeet <= 0) return
+    setStatus('loading')
+    try {
+      const res = await fetch('/api/quote', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type:         'rvboat',
+          category:     category === 'boat' ? 'Boat' : 'RV',
+          pkg:          selectedPkg.name,
+          pricePerFoot: selectedPkg.pricePerFoot,
+          length:       lengthFeet,
+          total,
+          ...form,
+        }),
+      })
+      if (!res.ok) throw new Error()
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="max-w-xl mx-auto text-center py-16">
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+          style={{ background: 'rgba(255,106,0,0.1)', border: '1px solid rgba(255,106,0,0.2)' }}>
+          <CheckCircle className="w-8 h-8" style={{ color: '#FF6A00' }} />
+        </div>
+        <h3 className="font-display font-bold text-2xl text-white uppercase mb-3">Quote Request Sent!</h3>
+        <p className="text-slate-400 mb-6">
+          We&apos;ll reach out shortly to confirm your ${total} estimate and get you booked.
+          Need it faster? Call us directly.
+        </p>
+        <a href={siteConfig.company.phoneHref} className="btn-orange px-6 py-3 text-sm inline-flex">
+          <Phone className="w-4 h-4" /> {siteConfig.company.phone}
+        </a>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="lg:col-span-2 space-y-10">
+
+        {/* Step 1 — boat or RV */}
+        <div>
+          <StepLabel n={1} label="Boat or RV?" />
+          <div className="grid grid-cols-2 gap-3">
+            {rvBoatCategories.map(c => {
+              const Icon = c.icon
+              const selected = category === c.id
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => selectCategory(c.id)}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl border text-left transition-all"
+                  style={selected
+                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: '#FF6A00' }} />
+                  <span className="font-display font-bold text-white uppercase tracking-wide">{c.label}</span>
+                  {selected && <Check className="w-4 h-4" style={{ color: '#FF6A00' }} />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Step 2 — package */}
+        <div>
+          <StepLabel n={2} label="Choose Your Package" />
+          {!category && (
+            <p className="text-sm text-slate-500 mb-3 italic">Select Boat or RV to see packages.</p>
+          )}
+          <div className="space-y-3">
+            {packages.map(p => {
+              const selected = pkgId === p.id
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPkgId(p.id)}
+                  className="w-full text-left p-4 rounded-xl border transition-all"
+                  style={selected
+                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display font-bold text-white uppercase tracking-wide">{p.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-display font-bold text-lg" style={{ color: '#FF8A3D' }}>
+                        ${p.pricePerFoot}/ft
+                      </span>
+                      {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
+                    </div>
+                  </div>
+                  <div className="text-xs text-slate-500">{p.includes.join(' · ')}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Step 3 — length */}
+        <div>
+          <StepLabel n={3} label="Enter Your Length (Feet)" />
+          <input
+            type="number"
+            min="0"
+            inputMode="decimal"
+            value={length}
+            onChange={e => setLength(e.target.value)}
+            placeholder="e.g. 24"
+            className={inputClass}
+            style={inputStyle}
+          />
+        </div>
+
+        {/* Step 4 — contact */}
+        <div>
+          <StepLabel n={4} label="Your Contact Info" />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Name *</label>
+                <input name="name" required value={form.name} onChange={handleFormChange}
+                  placeholder="Jane Smith" className={inputClass} style={inputStyle} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Phone</label>
+                <input name="phone" type="tel" value={form.phone} onChange={handleFormChange}
+                  placeholder="(402) 555-0000" className={inputClass} style={inputStyle} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email *</label>
+              <input name="email" type="email" required value={form.email} onChange={handleFormChange}
+                placeholder="jane@email.com" className={inputClass} style={inputStyle} />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                Where Is It Located?
+              </label>
+              <input name="address" value={form.address} onChange={handleFormChange}
+                placeholder="Marina, storage lot, or home address" className={inputClass} style={inputStyle} />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Notes</label>
+              <textarea name="notes" rows={3} value={form.notes} onChange={handleFormChange}
+                placeholder="Make/model, preferred day/time, anything else we should know…"
+                className={inputClass + ' resize-none'} style={inputStyle} />
+            </div>
+
+            {status === 'error' && (
+              <div className="flex items-center gap-2 p-3 rounded-xl text-sm"
+                style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#fca5a5' }}>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                Something went wrong. Please try again or call us directly.
+              </div>
+            )}
+
+            <button type="submit" disabled={!canSubmit || status === 'loading'}
+              className="btn-orange w-full py-4 text-base font-bold disabled:opacity-40 disabled:cursor-not-allowed">
+              {status === 'loading' ? (
+                <><Loader2 className="w-5 h-5 animate-spin" /> Sending…</>
+              ) : (
+                <><Send className="w-5 h-5" /> Book This Estimate — ${total}</>
+              )}
+            </button>
+            {!canSubmit && (
+              <p className="text-xs text-slate-500 text-center">
+                Select Boat or RV, choose a package, enter your length, and enter
+                your name &amp; email to book.
+              </p>
+            )}
+          </form>
+        </div>
+      </div>
+
+      {/* Sticky summary */}
+      <div className="lg:col-span-1">
+        <div className="lg:sticky lg:top-28 rounded-2xl border border-white/8 p-6 shadow-card"
+          style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: '#FF8A3D' }}>
+            Your Estimate
+          </div>
+
+          <div className="space-y-3 mb-5 text-sm">
+            <SummaryRow label="Type" value={category ? (category === 'boat' ? 'Boat' : 'RV') : '—'} />
+            <SummaryRow label="Package" value={selectedPkg ? selectedPkg.name : '—'} />
+            <SummaryRow label="Length" value={lengthFeet > 0 ? `${lengthFeet} ft` : '—'} />
+          </div>
+
+          <div className="pt-4 border-t border-white/10 flex items-end justify-between">
+            <span className="text-sm text-slate-400">Running Total</span>
+            <motion.span
+              key={total}
+              initial={{ scale: 1.15, color: '#FF8A3D' }}
+              animate={{ scale: 1, color: '#ffffff' }}
+              transition={{ duration: 0.35 }}
+              className="font-display font-bold text-4xl text-white"
+            >
+              ${total}
+            </motion.span>
+          </div>
+
+          {selectedPkg && lengthFeet > 0 && (
+            <p className="text-xs text-slate-500 mt-4 leading-relaxed">
+              ${selectedPkg.pricePerFoot}/ft × {lengthFeet} ft = ${total}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function StepLabel({ n, label }: { n: number; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-4">
@@ -489,7 +758,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────── */
-/*  Custom Quote — Ceramic Coating / Fleet / RV & Boat / Not Sure       */
+/*  Custom Quote — Ceramic Coating / Fleet / Not Sure                  */
 /* ─────────────────────────────────────────────────────────────────── */
 
 function CustomFlow() {
@@ -543,8 +812,8 @@ function CustomFlow() {
   return (
     <div className="max-w-2xl mx-auto">
       <p className="text-center text-slate-400 mb-8">
-        Ceramic coating, fleet washing, and RV/boat detailing are priced individually
-        based on the job. Tell us what you need and we&apos;ll send a custom quote.
+        Ceramic coating and fleet washing are priced individually based on the
+        job. Tell us what you need and we&apos;ll send a custom quote.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
@@ -589,7 +858,7 @@ function CustomFlow() {
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-            Vehicle / Fleet / RV / Boat Details
+            Vehicle / Fleet Details
           </label>
           <input name="details" value={form.details} onChange={handleFormChange}
             placeholder="Year, make, model, or fleet size" className={inputClass} style={inputStyle} />

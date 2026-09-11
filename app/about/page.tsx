@@ -107,10 +107,10 @@ export default function AboutPage() {
                     purely about whatever&apos;s easiest for your schedule.
                   </p>
                   <p>
-                    Every package is priced by vehicle size so pricing stays clear
-                    from the start, and specialty jobs like ceramic coating, fleet
-                    washing, and RV or boat detailing get a custom quote built around
-                    the specifics of the job.
+                    Every package is priced by vehicle size, and RV and boat
+                    detailing is priced by the foot — real numbers, right on our
+                    quote page. Specialty jobs like ceramic coating and fleet
+                    washing get a custom quote built around the specifics of the job.
                   </p>
                 </div>
               </ScrollReveal>
