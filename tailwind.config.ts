@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         display: ['var(--font-barlow)', 'system-ui', 'sans-serif'],
-        body:    ['var(--font-inter)',   'system-ui', 'sans-serif'],
+        body:    ['var(--font-body)',    'system-ui', 'sans-serif'],
         script:  ['var(--font-script)',  'cursive'],
       },
       fontSize: {

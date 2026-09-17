@@ -45,7 +45,7 @@ export const siteConfig = {
     {
       id:          'basic',
       name:        'Basic',
-      description: 'A quick, thorough refresh for the outside of your vehicle.',
+      description: 'A quick, thorough refresh — a wash outside plus a light wipe-down inside.',
       includes: [
         'Exterior wash',
         'Exterior windows',
@@ -59,7 +59,7 @@ export const siteConfig = {
     {
       id:          'premium',
       name:        'Premium',
-      description: 'Our most popular package — a full interior and exterior clean.',
+      description: 'A full interior and exterior clean.',
       includes: [
         'Exterior wash',
         'Interior detail',
@@ -71,7 +71,6 @@ export const siteConfig = {
         'Door jambs',
       ],
       prices: { small: 155, medium: 165, large: 175 },
-      popular: true,
     },
     {
       id:          'extreme',
@@ -94,22 +93,29 @@ export const siteConfig = {
       name:        'Interior Only',
       description: 'A deep clean for the inside of your vehicle only.',
       includes: [
-        'Full interior detail',
-        'Interior windows',
+        'Wipe dash',
+        'Clean cup holders',
         'Full vacuum',
-        'Interior trim dress',
+        'Shampoo carpet',
+        'Door jambs',
+        'Dress interior trim',
+        'Clean ceiling',
+        'Interior windows',
       ],
       prices: { small: 195, medium: 205, large: 215 },
+      popular: true,
     },
     {
       id:          'buffing',
       name:        'Buffing',
       description: 'Machine buff and paint sealant for a deep, protected shine.',
       includes: [
-        '3-step machine buff',
-        'Paint correction pass',
-        'Protective sealant',
-        'Exterior wash included',
+        'Hand wash vehicle',
+        'Detail wheels and tires',
+        'Dress fenders',
+        'Clay bar the vehicle',
+        '3-step buff the vehicle',
+        'Apply sealant to the vehicle',
       ],
       prices: { small: 250, medium: 300, large: 350 },
     },
@@ -132,8 +138,12 @@ export const siteConfig = {
   addons: [
     { id: 'odor',      label: 'Odor Treatment (Ozone)',   description: 'Eliminates smoke, pet, and mildew odors at the source.', price: 175 },
     { id: 'headlight', label: 'Headlight Restoration',    description: 'Removes fog and yellowing for clear, bright headlights.', price: 75  },
-    { id: 'pethair',   label: 'Pet Hair Removal',         description: 'Deep extraction of embedded pet hair from carpet & seats.', price: 35 },
   ],
+
+  // Not a selectable add-on — this is an automatic fee applied when a
+  // customer indicates their vehicle has pet hair. Keep it out of any
+  // add-on list; it's surfaced only via the dedicated pet hair question.
+  petHairFee: 35,
 
   quoteOnlyServices: [
     { id: 'ceramic', name: 'Ceramic Coating', description: 'Long-term paint protection with a high-gloss, hydrophobic finish.' },
@@ -245,7 +255,7 @@ export const siteConfig = {
     { label: 'Carpet & Seat Shampoo',    before: 'Set-in stains and odor',            after: 'Deep-cleaned carpet and upholstery',  tag: 'Extreme' },
     { label: '3-Step Buff & Seal',       before: 'Dull, swirl-marked paint',          after: 'Deep gloss with protective sealant',  tag: 'Buffing' },
     { label: 'Wheel & Tire Detail',      before: 'Brake dust and grime',              after: 'Detailed rims and dressed tires',     tag: 'Premium' },
-    { label: 'Pet Hair Removal',         before: 'Embedded hair in seats & carpet',   after: 'Fully extracted, fabric restored',    tag: 'Add-On' },
+    { label: 'Pet Hair Removal',         before: 'Embedded hair in seats & carpet',   after: 'Fully extracted, fabric restored',    tag: 'Pet Hair' },
   ],
 
   social: {

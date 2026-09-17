@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import {
   Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle, Store, Truck,
-  Anchor, Caravan,
+  Anchor, Caravan, Plus, Trash2,
 } from 'lucide-react'
 import { siteConfig, getPrice, getRvBoatTotal, type VehicleSize, type PackageTier, type RvBoatCategory } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
@@ -92,31 +92,64 @@ export default function QuoteFlow() {
 /*  Instant Price Estimate                                              */
 /* ─────────────────────────────────────────────────────────────────── */
 
-const optionalAddons = siteConfig.addons.filter(a => a.id !== 'pethair')
-const petHairFee = siteConfig.addons.find(a => a.id === 'pethair')?.price ?? 0
+const optionalAddons = siteConfig.addons
+const petHairFee = siteConfig.petHairFee
+
+interface VehicleConfig {
+  id:           string
+  size:         VehicleSize | null
+  pkg:          PackageTier | null
+  petHair:      boolean | null
+  addonIds:     string[]
+  vehicleColor: string
+  licensePlate: string
+}
+
+let vehicleIdCounter = 0
+function newVehicleId() {
+  vehicleIdCounter += 1
+  return `vehicle-${vehicleIdCounter}-${Date.now()}`
+}
+
+function makeVehicle(): VehicleConfig {
+  return { id: newVehicleId(), size: null, pkg: null, petHair: null, addonIds: [], vehicleColor: '', licensePlate: '' }
+}
+
+function vehicleAddonsTotal(v: VehicleConfig): number {
+  return v.addonIds.reduce((sum, id) => {
+    const a = siteConfig.addons.find(a => a.id === id)
+    return sum + (a ? a.price : 0)
+  }, 0)
+}
+
+function vehicleTotal(v: VehicleConfig): number {
+  const base = v.size && v.pkg ? getPrice(v.pkg, v.size) : 0
+  return base + vehicleAddonsTotal(v) + (v.petHair ? petHairFee : 0)
+}
+
+function vehicleComplete(v: VehicleConfig): boolean {
+  return !!v.size && !!v.pkg && v.petHair !== null
+}
 
 function EstimateFlow() {
-  const [size, setSize]     = useState<VehicleSize | null>(null)
-  const [pkg, setPkg]       = useState<PackageTier | null>(null)
-  const [petHair, setPetHair] = useState<boolean | null>(null)
-  const [addonIds, setAddonIds] = useState<string[]>([])
+  const [vehicles, setVehicles] = useState<VehicleConfig[]>([makeVehicle()])
   const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null)
-  const [form, setForm]     = useState({ name: '', email: '', phone: '', address: '', vehicleColor: '', licensePlate: '', notes: '' })
+  const [form, setForm]     = useState({ name: '', email: '', phone: '', address: '', notes: '' })
   const [status, setStatus] = useState<Status>('idle')
 
-  const basePrice = size && pkg ? getPrice(pkg, size) : 0
-  const addonsTotal = useMemo(
-    () => addonIds.reduce((sum, id) => {
-      const a = siteConfig.addons.find(a => a.id === id)
-      return sum + (a ? a.price : 0)
-    }, 0),
-    [addonIds],
-  )
-  const total = basePrice + addonsTotal + (petHair ? petHairFee : 0)
-  const canSubmit = !!size && !!pkg && petHair !== null && !!fulfillment && !!form.name && !!form.email
+  const total = useMemo(() => vehicles.reduce((sum, v) => sum + vehicleTotal(v), 0), [vehicles])
+  const canSubmit = vehicles.every(vehicleComplete) && !!fulfillment && !!form.name && !!form.email
 
-  function toggleAddon(id: string) {
-    setAddonIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  function updateVehicle(id: string, patch: Partial<VehicleConfig>) {
+    setVehicles(prev => prev.map(v => (v.id === id ? { ...v, ...patch } : v)))
+  }
+
+  function addVehicle() {
+    setVehicles(prev => [...prev, makeVehicle()])
+  }
+
+  function removeVehicle(id: string) {
+    setVehicles(prev => (prev.length > 1 ? prev.filter(v => v.id !== id) : prev))
   }
 
   function handleFormChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -125,24 +158,33 @@ function EstimateFlow() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!size || !pkg || petHair === null || !fulfillment) return
+    if (!vehicles.every(vehicleComplete) || !fulfillment) return
     setStatus('loading')
     try {
-      const pkgObj  = siteConfig.packages.find(p => p.id === pkg)!
-      const sizeObj = siteConfig.vehicleSizes.find(s => s.id === size)!
-      const addonLabels = addonIds.map(id => siteConfig.addons.find(a => a.id === id)!.label)
       const fulfillmentObj = fulfillmentOptions.find(f => f.id === fulfillment)!
       const address = fulfillment === 'dropoff' ? siteConfig.company.address.full : form.address
+
+      const vehiclePayload = vehicles.map(v => {
+        const sizeObj = siteConfig.vehicleSizes.find(s => s.id === v.size)!
+        const pkgObj  = siteConfig.packages.find(p => p.id === v.pkg)!
+        const addonLabels = v.addonIds.map(id => siteConfig.addons.find(a => a.id === id)!.label)
+        return {
+          size:         sizeObj.label,
+          pkg:          pkgObj.name,
+          petHair:      v.petHair ? 'Yes' : 'No',
+          addons:       addonLabels,
+          vehicleColor: v.vehicleColor,
+          licensePlate: v.licensePlate,
+          subtotal:     vehicleTotal(v),
+        }
+      })
 
       const res = await fetch('/api/quote', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'estimate',
-          size: sizeObj.label,
-          pkg:  pkgObj.name,
-          petHair: petHair ? 'Yes' : 'No',
-          addons: addonLabels,
+          vehicles: vehiclePayload,
           fulfillment: fulfillmentObj.label,
           total,
           ...form,
@@ -165,7 +207,8 @@ function EstimateFlow() {
         </div>
         <h3 className="font-display font-bold text-2xl text-white uppercase mb-3">Quote Request Sent!</h3>
         <p className="text-slate-400 mb-6">
-          We&apos;ll reach out shortly to confirm your ${total} estimate and get you booked.
+          We&apos;ll reach out shortly to confirm your ${total} estimate
+          {vehicles.length > 1 ? ` for ${vehicles.length} vehicles` : ''} and get you booked.
           Need it faster? Call us directly.
         </p>
         <a href={siteConfig.company.phoneHref} className="btn-orange px-6 py-3 text-sm inline-flex">
@@ -179,147 +222,33 @@ function EstimateFlow() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
       <div className="lg:col-span-2 space-y-10">
 
-        {/* Step 1 — size */}
+        {/* Step 1 — vehicle(s) */}
         <div>
-          <StepLabel n={1} label="Choose Your Vehicle Size" />
-          <p className="text-sm text-slate-500 mb-3">
-            Not sure which category fits? Use the photos below as a guide.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {siteConfig.vehicleSizes.map(s => (
-              <button
-                key={s.id}
-                onClick={() => setSize(s.id)}
-                className="text-left rounded-xl border overflow-hidden transition-all"
-                style={size === s.id
-                  ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
-                  : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
-              >
-                <div className="relative aspect-[4/3] bg-black/20">
-                  <Image
-                    src={s.image}
-                    alt={`${s.label} vehicle size example — ${s.sub}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 33vw"
-                    className="object-contain"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-display font-bold text-white uppercase tracking-wide">{s.label}</span>
-                    {size === s.id && <Check className="w-4 h-4" style={{ color: '#FF6A00' }} />}
-                  </div>
-                  <div className="text-xs text-slate-500">{s.sub}</div>
-                </div>
-              </button>
+          <StepLabel n={1} label={vehicles.length > 1 ? 'Your Vehicles' : 'Your Vehicle'} />
+          <div className="space-y-6">
+            {vehicles.map((v, i) => (
+              <VehicleCard
+                key={v.id}
+                vehicle={v}
+                index={i}
+                canRemove={vehicles.length > 1}
+                onChange={patch => updateVehicle(v.id, patch)}
+                onRemove={() => removeVehicle(v.id)}
+              />
             ))}
           </div>
+          <button
+            onClick={addVehicle}
+            type="button"
+            className="btn-outline w-full py-3.5 text-sm mt-4"
+          >
+            <Plus className="w-4 h-4" /> Add Another Vehicle
+          </button>
         </div>
 
-        {/* Step 2 — package */}
+        {/* Step 2 — drop off or mobile */}
         <div>
-          <StepLabel n={2} label="Choose Your Package" />
-          {!size && (
-            <p className="text-sm text-slate-500 mb-3 italic">Select a vehicle size to see pricing.</p>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {siteConfig.packages.map(p => {
-              const price = size ? p.prices[size] : null
-              const selected = pkg === p.id
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setPkg(p.id)}
-                  className="relative text-left p-4 rounded-xl border transition-all"
-                  style={selected
-                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
-                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
-                >
-                  {p.popular && (
-                    <span className="absolute -top-2 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest"
-                      style={{ background: '#FF6A00', color: '#000' }}>
-                      Popular
-                    </span>
-                  )}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-display font-bold text-white uppercase tracking-wide">{p.name}</span>
-                    {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
-                  </div>
-                  <div className="font-display font-bold text-lg" style={{ color: price ? '#FF8A3D' : '#475569' }}>
-                    {price ? `$${price}` : 'Select size'}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Step 3 — pet hair */}
-        <div>
-          <StepLabel n={3} label="Is There Pet Hair in the Vehicle?" />
-          <div className="grid grid-cols-2 gap-3">
-            {([
-              { value: true,  label: 'Yes', sub: `Adds a $${petHairFee} pet hair removal fee` },
-              { value: false, label: 'No',  sub: 'No pet hair to remove' },
-            ] as const).map(opt => {
-              const selected = petHair === opt.value
-              return (
-                <button
-                  key={opt.label}
-                  onClick={() => setPetHair(opt.value)}
-                  className="text-left p-4 rounded-xl border transition-all"
-                  style={selected
-                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
-                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-display font-bold text-white uppercase tracking-wide">{opt.label}</span>
-                    {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
-                  </div>
-                  <div className="text-xs text-slate-500">{opt.sub}</div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Step 4 — add-ons */}
-        <div>
-          <StepLabel n={4} label="Add Optional Extras" />
-          <div className="space-y-3">
-            {optionalAddons.map(a => {
-              const checked = addonIds.includes(a.id)
-              return (
-                <button
-                  key={a.id}
-                  onClick={() => toggleAddon(a.id)}
-                  className="w-full flex items-center justify-between gap-4 p-4 rounded-xl border text-left transition-all"
-                  style={checked
-                    ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
-                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0"
-                      style={checked ? { background: '#FF6A00', borderColor: '#FF6A00' } : { borderColor: 'rgba(255,255,255,0.25)' }}>
-                      {checked && <Check className="w-3.5 h-3.5 text-black" />}
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">{a.label}</div>
-                      <div className="text-xs text-slate-500">{a.description}</div>
-                    </div>
-                  </div>
-                  <div className="font-display font-bold text-sm flex-shrink-0" style={{ color: '#FF8A3D' }}>
-                    +${a.price}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Step 5 — drop off or mobile */}
-        <div>
-          <StepLabel n={5} label="Drop Off or We Come to You" />
+          <StepLabel n={2} label="Drop Off or We Come to You" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {fulfillmentOptions.map(f => {
               const selected = fulfillment === f.id
@@ -348,9 +277,9 @@ function EstimateFlow() {
           </div>
         </div>
 
-        {/* Step 6 — contact */}
+        {/* Step 3 — contact */}
         <div>
-          <StepLabel n={6} label="Your Contact Info" />
+          <StepLabel n={3} label="Your Contact Info" />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -384,18 +313,6 @@ function EstimateFlow() {
                   placeholder="Where should we meet you?" className={inputClass} style={inputStyle} />
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Vehicle Color</label>
-                <input name="vehicleColor" value={form.vehicleColor} onChange={handleFormChange}
-                  placeholder="e.g. Silver" className={inputClass} style={inputStyle} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">License Plate</label>
-                <input name="licensePlate" value={form.licensePlate} onChange={handleFormChange}
-                  placeholder="e.g. ABC-1234" className={inputClass} style={inputStyle} />
-              </div>
-            </div>
             <div>
               <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Notes</label>
               <textarea name="notes" rows={3} value={form.notes} onChange={handleFormChange}
@@ -416,13 +333,13 @@ function EstimateFlow() {
               {status === 'loading' ? (
                 <><Loader2 className="w-5 h-5 animate-spin" /> Sending…</>
               ) : (
-                <><Send className="w-5 h-5" /> Book This Estimate — ${total}</>
+                <><Send className="w-5 h-5" /> Book {vehicles.length > 1 ? `${vehicles.length} Vehicles` : 'This Estimate'} — ${total}</>
               )}
             </button>
             {!canSubmit && (
               <p className="text-xs text-slate-500 text-center">
-                Select a size, a package, answer the pet hair question, choose a
-                drop-off or mobile option, and enter your name &amp; email to book.
+                Finish configuring each vehicle (size, package, pet hair question),
+                choose a drop-off or mobile option, and enter your name &amp; email to book.
               </p>
             )}
           </form>
@@ -437,29 +354,37 @@ function EstimateFlow() {
             Your Estimate
           </div>
 
-          <div className="space-y-3 mb-5 text-sm">
-            <SummaryRow label="Vehicle Size" value={size ? siteConfig.vehicleSizes.find(s => s.id === size)!.label : '—'} />
-            <SummaryRow label="Package" value={pkg ? siteConfig.packages.find(p => p.id === pkg)!.name : '—'} />
-            <SummaryRow label="Service Type" value={fulfillment ? fulfillmentOptions.find(f => f.id === fulfillment)!.label : '—'} />
-            {petHair !== null && (
-              <div className="flex justify-between text-xs text-slate-400 pt-2 border-t border-white/5">
-                <span>Pet Hair in Vehicle</span>
-                <span>{petHair ? `Yes (+$${petHairFee})` : 'No'}</span>
-              </div>
-            )}
-            {addonIds.length > 0 && (
-              <div className="pt-2 border-t border-white/5">
-                {addonIds.map(id => {
+          <div className="space-y-4 mb-5 text-sm">
+            {vehicles.map((v, i) => (
+              <div key={v.id} className={i > 0 ? 'pt-3 border-t border-white/5' : ''}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    {vehicles.length > 1 ? `Vehicle ${i + 1}` : 'Vehicle'}
+                  </span>
+                  <span className="text-white font-semibold">${vehicleTotal(v)}</span>
+                </div>
+                <SummaryRow label="Size" value={v.size ? siteConfig.vehicleSizes.find(s => s.id === v.size)!.label : '—'} />
+                <SummaryRow label="Package" value={v.pkg ? siteConfig.packages.find(p => p.id === v.pkg)!.name : '—'} />
+                {v.petHair !== null && (
+                  <div className="flex justify-between text-xs text-slate-400 pt-1">
+                    <span>Pet Hair</span>
+                    <span>{v.petHair ? `Yes (+$${petHairFee})` : 'No'}</span>
+                  </div>
+                )}
+                {v.addonIds.map(id => {
                   const a = siteConfig.addons.find(a => a.id === id)!
                   return (
-                    <div key={id} className="flex justify-between text-xs text-slate-400 py-1">
+                    <div key={id} className="flex justify-between text-xs text-slate-400 pt-1">
                       <span>{a.label}</span>
                       <span>+${a.price}</span>
                     </div>
                   )
                 })}
               </div>
-            )}
+            ))}
+            <div className="pt-3 border-t border-white/5">
+              <SummaryRow label="Service Type" value={fulfillment ? fulfillmentOptions.find(f => f.id === fulfillment)!.label : '—'} />
+            </div>
           </div>
 
           <div className="pt-4 border-t border-white/10 flex items-end justify-between">
@@ -479,6 +404,206 @@ function EstimateFlow() {
             Final price confirmed at booking. Add-ons stack on top of your selected package.
           </p>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function VehicleCard({
+  vehicle, index, canRemove, onChange, onRemove,
+}: {
+  vehicle:   VehicleConfig
+  index:     number
+  canRemove: boolean
+  onChange:  (patch: Partial<VehicleConfig>) => void
+  onRemove:  () => void
+}) {
+  function toggleAddon(id: string) {
+    onChange({
+      addonIds: vehicle.addonIds.includes(id)
+        ? vehicle.addonIds.filter(x => x !== id)
+        : [...vehicle.addonIds, id],
+    })
+  }
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-card-gradient p-5 sm:p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-display font-bold text-sm text-black"
+            style={{ background: '#FF6A00' }}>
+            {index + 1}
+          </div>
+          <h4 className="font-display font-bold text-white uppercase tracking-wide text-lg">
+            Vehicle {index + 1}
+          </h4>
+        </div>
+        {canRemove && (
+          <button type="button" onClick={onRemove}
+            className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-red-400 transition-colors">
+            <Trash2 className="w-3.5 h-3.5" /> Remove
+          </button>
+        )}
+      </div>
+
+      {/* Size */}
+      <div>
+        <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2.5">Vehicle Size</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {siteConfig.vehicleSizes.map(s => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => onChange({ size: s.id })}
+              className="text-left rounded-xl border overflow-hidden transition-all"
+              style={vehicle.size === s.id
+                ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+            >
+              <div className="relative aspect-[4/3] bg-black/20">
+                <Image
+                  src={s.image}
+                  alt={`${s.label} vehicle size example — ${s.sub}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-contain"
+                />
+              </div>
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-display font-bold text-white uppercase tracking-wide text-sm">{s.label}</span>
+                  {vehicle.size === s.id && <Check className="w-4 h-4" style={{ color: '#FF6A00' }} />}
+                </div>
+                <div className="text-xs text-slate-500">{s.sub}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Package */}
+      <div>
+        <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2.5">Package</div>
+        {!vehicle.size && (
+          <p className="text-xs text-slate-500 mb-2 italic">Select a vehicle size to see pricing.</p>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {siteConfig.packages.map(p => {
+            const price = vehicle.size ? p.prices[vehicle.size] : null
+            const selected = vehicle.pkg === p.id
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => onChange({ pkg: p.id })}
+                className="relative text-left p-4 rounded-xl border transition-all"
+                style={selected
+                  ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                  : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              >
+                {p.popular && (
+                  <span className="absolute -top-2 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest"
+                    style={{ background: '#FF6A00', color: '#000' }}>
+                    Popular
+                  </span>
+                )}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-display font-bold text-white uppercase tracking-wide">{p.name}</span>
+                  {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
+                </div>
+                <div className="font-display font-bold text-lg" style={{ color: price ? '#FF8A3D' : '#475569' }}>
+                  {price ? `$${price}` : 'Select size'}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Pet hair */}
+      <div>
+        <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2.5">
+          Is There Pet Hair in This Vehicle?
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            { value: true,  label: 'Yes', sub: `Adds a $${petHairFee} pet hair removal fee` },
+            { value: false, label: 'No',  sub: 'No pet hair to remove' },
+          ] as const).map(opt => {
+            const selected = vehicle.petHair === opt.value
+            return (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => onChange({ petHair: opt.value })}
+                className="text-left p-4 rounded-xl border transition-all"
+                style={selected
+                  ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                  : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-display font-bold text-white uppercase tracking-wide">{opt.label}</span>
+                  {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
+                </div>
+                <div className="text-xs text-slate-500">{opt.sub}</div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Add-ons */}
+      <div>
+        <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2.5">Optional Extras</div>
+        <div className="space-y-3">
+          {optionalAddons.map(a => {
+            const checked = vehicle.addonIds.includes(a.id)
+            return (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => toggleAddon(a.id)}
+                className="w-full flex items-center justify-between gap-4 p-4 rounded-xl border text-left transition-all"
+                style={checked
+                  ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
+                  : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0"
+                    style={checked ? { background: '#FF6A00', borderColor: '#FF6A00' } : { borderColor: 'rgba(255,255,255,0.25)' }}>
+                    {checked && <Check className="w-3.5 h-3.5 text-black" />}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-white">{a.label}</div>
+                    <div className="text-xs text-slate-500">{a.description}</div>
+                  </div>
+                </div>
+                <div className="font-display font-bold text-sm flex-shrink-0" style={{ color: '#FF8A3D' }}>
+                  +${a.price}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Vehicle color / plate */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Vehicle Color</label>
+          <input value={vehicle.vehicleColor} onChange={e => onChange({ vehicleColor: e.target.value })}
+            placeholder="e.g. Silver" className={inputClass} style={inputStyle} />
+        </div>
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">License Plate</label>
+          <input value={vehicle.licensePlate} onChange={e => onChange({ licensePlate: e.target.value })}
+            placeholder="e.g. ABC-1234" className={inputClass} style={inputStyle} />
+        </div>
+      </div>
+
+      <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+        <span className="text-sm text-slate-400">Vehicle {index + 1} Subtotal</span>
+        <span className="font-display font-bold text-2xl text-white">${vehicleTotal(vehicle)}</span>
       </div>
     </div>
   )

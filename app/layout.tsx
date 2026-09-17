@@ -1,19 +1,19 @@
 import type { Metadata } from 'next'
-import { Barlow_Condensed, Inter, Caveat } from 'next/font/google'
+import { Barlow, Plus_Jakarta_Sans, Caveat } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { siteConfig } from '@/lib/config'
 
-const barlowCondensed = Barlow_Condensed({
+const barlow = Barlow({
   subsets:  ['latin'],
   weight:   ['600', '700', '800'],
   variable: '--font-barlow',
   display:  'swap',
 })
 
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets:  ['latin'],
-  variable: '--font-inter',
+  variable: '--font-body',
   display:  'swap',
 })
 
@@ -39,7 +39,7 @@ const GA4_ID = process.env.NEXT_PUBLIC_GA4_GP_MOBILE
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${barlowCondensed.variable} ${inter.variable} ${caveat.variable}`}>
+    <html lang="en" className={`${barlow.variable} ${jakarta.variable} ${caveat.variable}`}>
       <body className="font-body antialiased">
         {GA4_ID && (
           <>

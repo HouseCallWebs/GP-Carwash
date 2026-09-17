@@ -18,9 +18,9 @@ interface SocialLinksProps {
 }
 
 export default function SocialLinks({
-  className     = 'flex items-center gap-2',
-  itemClassName = 'w-7 h-7 rounded-lg border border-white/10 bg-white/3 flex items-center justify-center text-slate-400 hover:text-[#FF6A00] hover:border-[#FF6A00]/40 transition-colors',
-  iconClassName = 'w-3.5 h-3.5',
+  className     = 'flex items-center gap-2.5',
+  itemClassName = 'w-9 h-9 rounded-lg border border-white/10 bg-white/3 flex items-center justify-center text-slate-400 hover:text-[#FF6A00] hover:border-[#FF6A00]/40 transition-colors',
+  iconClassName = 'w-4 h-4',
 }: SocialLinksProps) {
   return (
     <div className={className}>

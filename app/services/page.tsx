@@ -19,7 +19,7 @@ export default function ServicesPage() {
       <Navigation />
 
       {/* Header */}
-      <section className="relative pt-40 pb-16 overflow-hidden"
+      <section className="relative pt-48 pb-16 overflow-hidden"
         style={{ background: 'linear-gradient(180deg, #0e0e0e 0%, #0a0a0a 100%)' }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] rounded-full blur-3xl pointer-events-none"
           style={{ background: 'rgba(255,106,0,0.05)' }} />
@@ -109,7 +109,7 @@ export default function ServicesPage() {
               </h2>
             </ScrollReveal>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
             {siteConfig.addons.map((a, i) => (
               <ScrollReveal key={a.id} delay={i * 0.08}>
                 <div className="p-6 rounded-2xl border border-white/6 bg-card-gradient h-full">
@@ -120,6 +120,11 @@ export default function ServicesPage() {
               </ScrollReveal>
             ))}
           </div>
+          <ScrollReveal delay={0.2} className="text-center mt-6">
+            <p className="text-sm text-slate-500 italic">
+              Pet hair removal (+$35) is applied automatically when needed — no need to add it, we&apos;ll ask.
+            </p>
+          </ScrollReveal>
         </div>
       </section>
 

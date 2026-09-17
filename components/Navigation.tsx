@@ -36,11 +36,11 @@ export default function Navigation() {
       {/* Utility topbar */}
       <div className="border-b border-white/5" style={{ background: 'rgba(0,0,0,0.35)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-8">
+          <div className="flex items-center justify-between h-11">
             <SocialLinks />
             <a href={siteConfig.company.giftCardUrl} target="_blank" rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-[#FF8A3D] transition-colors">
-              <Gift className="w-3.5 h-3.5" style={{ color: '#FF6A00' }} strokeWidth={2} />
+              className="hidden sm:flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-[#FF8A3D] transition-colors">
+              <Gift className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
               Buy a Gift Card
             </a>
           </div>
@@ -48,44 +48,44 @@ export default function Navigation() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-20 lg:h-24">
 
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
-            <Logo className="h-11 lg:h-12 w-auto" />
+            <Logo className="h-14 lg:h-16 w-auto" />
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1">
             <Link href="/"
-              className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
+              className="px-4 py-2.5 text-base font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
               Home
             </Link>
             {navLinks.map(l => (
               <Link key={l.href} href={l.href}
-                className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
+                className="px-4 py-2.5 text-base font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
                 {l.label}
               </Link>
             ))}
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
             <a href={siteConfig.company.phoneHref}
-              className="flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-white transition-colors">
-              <Phone className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
+              className="flex items-center gap-2 text-base font-semibold text-slate-300 hover:text-white transition-colors">
+              <Phone className="w-5 h-5" style={{ color: '#FF6A00' }} strokeWidth={2} />
               {siteConfig.company.phone}
             </a>
-            <Link href="/quote" className="btn-orange px-5 py-2.5 text-sm">
+            <Link href="/quote" className="btn-orange px-6 py-3 text-base">
               Get a Quote
             </Link>
           </div>
 
           {/* Mobile hamburger */}
           <button onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors"
+            className="lg:hidden p-2.5 text-slate-400 hover:text-white transition-colors"
             aria-label="Toggle menu">
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
         </div>
       </div>
@@ -100,26 +100,26 @@ export default function Navigation() {
             transition={{ duration: 0.25 }}
             className="lg:hidden overflow-hidden bg-dark-850/98 backdrop-blur-md border-b border-white/6"
           >
-            <div className="px-4 py-5 space-y-1 max-h-[80vh] overflow-y-auto">
+            <div className="px-4 py-5 space-y-1.5 max-h-[80vh] overflow-y-auto">
               <Link href="/" onClick={() => setMenuOpen(false)}
-                className="block py-2.5 px-3 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
+                className="block py-3 px-3 rounded-lg text-base font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
                 Home
               </Link>
               {navLinks.map(l => (
                 <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
-                  className="block py-2.5 px-3 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
+                  className="block py-3 px-3 rounded-lg text-base font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
                   {l.label}
                 </Link>
               ))}
               <a href={siteConfig.company.giftCardUrl} target="_blank" rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
-                <Gift className="w-4 h-4" style={{ color: '#FF6A00' }} strokeWidth={2} />
+                className="flex items-center gap-2 py-3 px-3 rounded-lg text-base font-medium text-slate-300 hover:text-white hover:bg-white/4 transition-all">
+                <Gift className="w-5 h-5" style={{ color: '#FF6A00' }} strokeWidth={2} />
                 Buy a Gift Card
               </a>
               <div className="pt-3 border-t border-white/6 mt-3">
-                <a href={siteConfig.company.phoneHref} className="btn-orange w-full py-3 text-sm">
-                  <Phone className="w-4 h-4" strokeWidth={2} />
+                <a href={siteConfig.company.phoneHref} className="btn-orange w-full py-3.5 text-base">
+                  <Phone className="w-5 h-5" strokeWidth={2} />
                   Call {siteConfig.company.phone}
                 </a>
               </div>

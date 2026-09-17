@@ -1,21 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-interface EstimateBody {
-  type:          'estimate'
+interface EstimateVehicle {
   size:          string
   pkg:           string
   petHair:       string
   addons:        string[]
-  fulfillment:   string
-  total:         number
-  name:          string
-  email:         string
-  phone:         string
-  address?:      string
   vehicleColor?: string
   licensePlate?: string
-  notes?:        string
+  subtotal:      number
+}
+
+interface EstimateBody {
+  type:        'estimate'
+  vehicles:    EstimateVehicle[]
+  fulfillment: string
+  total:       number
+  name:        string
+  email:       string
+  phone:       string
+  address?:    string
+  notes?:      string
 }
 
 interface RvBoatBody {
@@ -60,43 +65,60 @@ export async function POST(req: NextRequest) {
 
     if (body.type === 'estimate') {
       title   = 'New Quote Request'
-      subject = `New Quote Request — ${body.pkg} (${body.size}) | ${body.name}`
-      detailRows = `
+      const vehicleSummary = body.vehicles.length === 1
+        ? `${body.vehicles[0].pkg} (${body.vehicles[0].size})`
+        : `${body.vehicles.length} Vehicles`
+      subject = `New Quote Request — ${vehicleSummary} | ${body.name}`
+
+      const vehicleRows = body.vehicles.map((v, i) => `
         <tr>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px; width: 150px;">Vehicle Size</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${body.size}</td>
+          <td colspan="2" style="padding: ${i === 0 ? '0' : '20'}px 0 6px; border-bottom: 2px solid rgba(255,106,0,0.3); color: #FF8A3D; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;">
+            ${body.vehicles.length > 1 ? `Vehicle ${i + 1}` : 'Vehicle'}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px; width: 150px;">Size</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${v.size}</td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Package</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${body.pkg}</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${v.pkg}</td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Pet Hair in Vehicle</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${body.petHair}</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${v.petHair}</td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Add-Ons</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${body.addons.length ? body.addons.join(', ') : 'None'}</td>
-        </tr>
-        <tr>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Service Type</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #FF8A3D; font-size: 14px; font-weight: 700;">${body.fulfillment}</td>
-        </tr>
-        <tr>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Estimated Total</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #FF8A3D; font-size: 18px; font-weight: 800;">$${body.total}</td>
-        </tr>
-        <tr>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Address</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${body.address || '—'}</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${v.addons.length ? v.addons.join(', ') : 'None'}</td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Vehicle Color</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${body.vehicleColor || '—'}</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${v.vehicleColor || '—'}</td>
         </tr>
         <tr>
-          <td style="padding: 10px 0; color: #94a3b8; font-size: 13px;">License Plate</td>
-          <td style="padding: 10px 0; color: #f1f5f9; font-size: 14px;">${body.licensePlate || '—'}</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">License Plate</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${v.licensePlate || '—'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Subtotal</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #FF8A3D; font-size: 14px; font-weight: 700;">$${v.subtotal}</td>
+        </tr>
+      `).join('')
+
+      detailRows = `
+        ${vehicleRows}
+        <tr>
+          <td style="padding: 20px 0 10px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Service Type</td>
+          <td style="padding: 20px 0 10px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #FF8A3D; font-size: 14px; font-weight: 700;">${body.fulfillment}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Grand Total</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #FF8A3D; font-size: 18px; font-weight: 800;">$${body.total}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; color: #94a3b8; font-size: 13px;">Address</td>
+          <td style="padding: 10px 0; color: #f1f5f9; font-size: 14px;">${body.address || '—'}</td>
         </tr>
       `
       messageBlock = body.notes
