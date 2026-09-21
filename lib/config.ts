@@ -136,15 +136,6 @@ export const siteConfig = {
     { id: 'console',    label: 'Center Console Detail',   beforeSrc: '/gallery/console-before.jpg',    afterSrc: '/gallery/console-after.jpg'    },
   ],
 
-  // Single, non-slider gallery photos — used for jobs where there's no
-  // matching before/after pair to compare.
-  photoGalleryItems: [
-    { id: 'boat',     label: 'Boat Interior Detail',       src: '/gallery/boat-1.jpg', tag: 'Boat' },
-    { id: 'rv-1',     label: 'Enclosed Trailer Detail',    src: '/gallery/rv-1.jpg',   tag: 'RV'   },
-    { id: 'rv-2',     label: 'Travel Trailer Detail',      src: '/gallery/rv-2.jpg',   tag: 'RV'   },
-    { id: 'rv-3',     label: 'Motorhome Detail',           src: '/gallery/rv-3.jpg',   tag: 'RV'   },
-  ],
-
   addons: [
     { id: 'odor',      label: 'Odor Treatment (Ozone)',   description: 'Eliminates smoke, pet, and mildew odors at the source.', price: 175 },
     { id: 'headlight', label: 'Headlight Restoration',    description: 'Removes fog and yellowing for clear, bright headlights.', price: 75  },
@@ -257,15 +248,6 @@ export const siteConfig = {
     { icon: 'MapPin',   title: '35-Mile Service Area',   body: 'We serve Lincoln, NE and every community within a 35-mile radius.' },
     { icon: 'Clock',    title: 'Flexible Scheduling',    body: 'Weekday appointments Monday through Friday, plus Saturdays by appointment.' },
     { icon: 'Droplets', title: 'Detail-Focused',         body: 'From a quick exterior wash to a full ceramic coating — we treat every vehicle like our own.' },
-  ],
-
-  galleryItems: [
-    { label: 'Exterior Wash & Wax',      before: 'Road grime, dust, and water spots', after: 'Clean, streak-free shine',           tag: 'Exterior' },
-    { label: 'Full Interior Detail',     before: 'Crumbs, dust, and stains',          after: 'Vacuumed, wiped, and fresh',          tag: 'Interior' },
-    { label: 'Carpet & Seat Shampoo',    before: 'Set-in stains and odor',            after: 'Deep-cleaned carpet and upholstery',  tag: 'Extreme' },
-    { label: '3-Step Buff & Seal',       before: 'Dull, swirl-marked paint',          after: 'Deep gloss with protective sealant',  tag: 'Buffing' },
-    { label: 'Wheel & Tire Detail',      before: 'Brake dust and grime',              after: 'Detailed rims and dressed tires',     tag: 'Premium' },
-    { label: 'Pet Hair Removal',         before: 'Embedded hair in seats & carpet',   after: 'Fully extracted, fabric restored',    tag: 'Pet Hair' },
   ],
 
   social: {
