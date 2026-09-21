@@ -9,8 +9,8 @@ export default function Logo({ className }: LogoProps) {
     <Image
       src="/logo.png"
       alt="GP Mobile Car Wash & Detail"
-      width={386}
-      height={264}
+      width={800}
+      height={547}
       className={className}
       priority
     />
