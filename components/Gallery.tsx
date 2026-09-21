@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { siteConfig } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
@@ -47,6 +48,32 @@ export default function Gallery() {
                 afterSrc={photo.afterSrc}
                 label={photo.label}
               />
+            </motion.div>
+          ))}
+          {siteConfig.photoGalleryItems.map((item, i) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: i * 0.07 }}
+            >
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/10">
+                <Image
+                  src={item.src}
+                  alt={item.label}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex items-center justify-between mt-3">
+                <h3 className="text-sm font-bold text-white">{item.label}</h3>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ background: 'rgba(255,106,0,0.1)', color: '#FF8A3D', border: '1px solid rgba(255,106,0,0.15)' }}>
+                  {item.tag}
+                </span>
+              </div>
             </motion.div>
           ))}
           {siteConfig.galleryItems.map((item, i) => (
