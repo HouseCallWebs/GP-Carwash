@@ -133,6 +133,16 @@ export const siteConfig = {
     { id: 'mirror',     label: 'Exterior Mirror Detail',  beforeSrc: '/gallery/mirror-before.jpg',     afterSrc: '/gallery/mirror-after.jpg'     },
     { id: 'headlight2', label: 'Headlight Restoration',   beforeSrc: '/gallery/headlight2-before.jpg', afterSrc: '/gallery/headlight2-after.jpg' },
     { id: 'carpet',     label: 'Carpet Shampoo',          beforeSrc: '/gallery/carpet-before.jpg',     afterSrc: '/gallery/carpet-after.jpg'     },
+    { id: 'console',    label: 'Center Console Detail',   beforeSrc: '/gallery/console-before.jpg',    afterSrc: '/gallery/console-after.jpg'    },
+  ],
+
+  // Single, non-slider gallery photos — used for jobs where there's no
+  // matching before/after pair to compare.
+  photoGalleryItems: [
+    { id: 'boat',     label: 'Boat Interior Detail',       src: '/gallery/boat-1.jpg', tag: 'Boat' },
+    { id: 'rv-1',     label: 'Enclosed Trailer Detail',    src: '/gallery/rv-1.jpg',   tag: 'RV'   },
+    { id: 'rv-2',     label: 'Travel Trailer Detail',      src: '/gallery/rv-2.jpg',   tag: 'RV'   },
+    { id: 'rv-3',     label: 'Motorhome Detail',           src: '/gallery/rv-3.jpg',   tag: 'RV'   },
   ],
 
   addons: [
