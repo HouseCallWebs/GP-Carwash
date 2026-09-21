@@ -137,12 +137,6 @@ export default function Gallery({ showHeader = true }: GalleryProps) {
             </motion.div>
           ))}
         </div>
-
-        <ScrollReveal delay={0.3} className="text-center mt-10">
-          <p className="text-slate-500 text-sm italic">
-            More before &amp; after photos coming soon — check back after our next round of jobs.
-          </p>
-        </ScrollReveal>
       </div>
     </section>
   )
