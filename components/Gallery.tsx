@@ -6,7 +6,11 @@ import { siteConfig } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 
-export default function Gallery() {
+interface GalleryProps {
+  showHeader?: boolean
+}
+
+export default function Gallery({ showHeader = true }: GalleryProps) {
   return (
     <section id="gallery" className="relative py-24 lg:py-32 overflow-hidden"
       style={{ background: '#0a0a0a' }}>
@@ -16,23 +20,25 @@ export default function Gallery() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="text-center mb-14">
-          <ScrollReveal>
-            <span className="badge-accent">Before &amp; After</span>
-          </ScrollReveal>
-          <ScrollReveal delay={0.1}>
-            <h2 className="font-display font-bold text-section text-white uppercase mb-5">
-              The Proof Is in{' '}
-              <span className="gradient-text-accent">the Shine.</span>
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal delay={0.15}>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Drag the sliders below to see real before &amp; after results. More
-              photos are added after every job.
-            </p>
-          </ScrollReveal>
-        </div>
+        {showHeader && (
+          <div className="text-center mb-14">
+            <ScrollReveal>
+              <span className="badge-accent">Before &amp; After</span>
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <h2 className="font-display font-bold text-section text-white uppercase mb-5">
+                The Proof Is in{' '}
+                <span className="gradient-text-accent">the Shine.</span>
+              </h2>
+            </ScrollReveal>
+            <ScrollReveal delay={0.15}>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                Drag the sliders below to see real before &amp; after results. More
+                photos are added after every job.
+              </p>
+            </ScrollReveal>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {siteConfig.beforeAfterPhotos.map((photo, i) => (

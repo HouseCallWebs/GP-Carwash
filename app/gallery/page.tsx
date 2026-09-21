@@ -39,7 +39,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      <Gallery />
+      <Gallery showHeader={false} />
       <FinalCTA />
       <Footer />
     </main>
