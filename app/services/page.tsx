@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import FinalCTA from '@/components/FinalCTA'
 import RvBoatSection from '@/components/RvBoatSection'
+import PriceIncreaseNotice from '@/components/PriceIncreaseNotice'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import { siteConfig } from '@/lib/config'
 import { Check, ArrowRight } from 'lucide-react'
@@ -19,11 +20,16 @@ export default function ServicesPage() {
       <Navigation />
 
       {/* Header */}
-      <section className="relative pt-48 pb-16 overflow-hidden"
+      <section className="relative pt-52 pb-16 overflow-hidden"
         style={{ background: 'linear-gradient(180deg, #0e0e0e 0%, #0a0a0a 100%)' }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] rounded-full blur-3xl pointer-events-none"
           style={{ background: 'rgba(255,106,0,0.05)' }} />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {siteConfig.priceIncreaseNotice.enabled && (
+            <ScrollReveal className="mb-6">
+              <PriceIncreaseNotice variant="callout" />
+            </ScrollReveal>
+          )}
           <ScrollReveal>
             <span className="badge-accent">Services &amp; Pricing</span>
           </ScrollReveal>

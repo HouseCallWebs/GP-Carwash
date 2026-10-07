@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { Suspense, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import {
@@ -23,6 +24,14 @@ const inputStyle = { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(25
 const inputClass = 'w-full px-4 py-3 rounded-xl border text-white text-sm placeholder-slate-500 outline-none transition-all focus:border-[#FF6A00]/50 focus:shadow-[0_0_0_2px_rgba(255,106,0,0.12)]'
 
 export default function QuoteFlow() {
+  return (
+    <Suspense fallback={<div className="min-h-[40rem]" />}>
+      <QuoteFlowInner />
+    </Suspense>
+  )
+}
+
+function QuoteFlowInner() {
   const [mode, setMode] = useState<Mode>('estimate')
 
   return (
@@ -101,6 +110,7 @@ interface VehicleConfig {
   pkg:          PackageTier | null
   petHair:      boolean | null
   addonIds:     string[]
+  makeModel:    string
   vehicleColor: string
   licensePlate: string
 }
@@ -111,8 +121,17 @@ function newVehicleId() {
   return `vehicle-${vehicleIdCounter}-${Date.now()}`
 }
 
-function makeVehicle(): VehicleConfig {
-  return { id: newVehicleId(), size: null, pkg: null, petHair: null, addonIds: [], vehicleColor: '', licensePlate: '' }
+function makeVehicle(preselect?: { size?: VehicleSize | null; pkg?: PackageTier | null }): VehicleConfig {
+  return {
+    id: newVehicleId(),
+    size: preselect?.size ?? null,
+    pkg: preselect?.pkg ?? null,
+    petHair: null,
+    addonIds: [],
+    makeModel: '',
+    vehicleColor: '',
+    licensePlate: '',
+  }
 }
 
 function vehicleAddonsTotal(v: VehicleConfig): number {
@@ -128,11 +147,19 @@ function vehicleTotal(v: VehicleConfig): number {
 }
 
 function vehicleComplete(v: VehicleConfig): boolean {
-  return !!v.size && !!v.pkg && v.petHair !== null
+  return !!v.size && !!v.pkg && v.petHair !== null && v.makeModel.trim().length > 0
 }
 
 function EstimateFlow() {
-  const [vehicles, setVehicles] = useState<VehicleConfig[]>([makeVehicle()])
+  const searchParams = useSearchParams()
+  const [vehicles, setVehicles] = useState<VehicleConfig[]>(() => {
+    const pkgParam  = searchParams.get('pkg')
+    const sizeParam = searchParams.get('size')
+    return [makeVehicle({
+      pkg:  siteConfig.packages.find(p => p.id === pkgParam)?.id ?? null,
+      size: siteConfig.vehicleSizes.find(s => s.id === sizeParam)?.id ?? null,
+    })]
+  })
   const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null)
   const [form, setForm]     = useState({ name: '', email: '', phone: '', address: '', notes: '' })
   const [status, setStatus] = useState<Status>('idle')
@@ -167,12 +194,18 @@ function EstimateFlow() {
       const vehiclePayload = vehicles.map(v => {
         const sizeObj = siteConfig.vehicleSizes.find(s => s.id === v.size)!
         const pkgObj  = siteConfig.packages.find(p => p.id === v.pkg)!
-        const addonLabels = v.addonIds.map(id => siteConfig.addons.find(a => a.id === id)!.label)
+        const addonItems = v.addonIds.map(id => {
+          const a = siteConfig.addons.find(a => a.id === id)!
+          return { label: a.label, price: a.price }
+        })
         return {
           size:         sizeObj.label,
+          makeModel:    v.makeModel.trim(),
           pkg:          pkgObj.name,
           petHair:      v.petHair ? 'Yes' : 'No',
-          addons:       addonLabels,
+          basePrice:    getPrice(pkgObj.id, sizeObj.id),
+          petHairFee:   v.petHair ? petHairFee : 0,
+          addons:       addonItems,
           vehicleColor: v.vehicleColor,
           licensePlate: v.licensePlate,
           subtotal:     vehicleTotal(v),
@@ -338,7 +371,7 @@ function EstimateFlow() {
             </button>
             {!canSubmit && (
               <p className="text-xs text-slate-500 text-center">
-                Finish configuring each vehicle (size, package, pet hair question),
+                Finish configuring each vehicle (size, make &amp; model, package, pet hair question),
                 choose a drop-off or mobile option, and enter your name &amp; email to book.
               </p>
             )}
@@ -364,6 +397,7 @@ function EstimateFlow() {
                   <span className="text-white font-semibold">${vehicleTotal(v)}</span>
                 </div>
                 <SummaryRow label="Size" value={v.size ? siteConfig.vehicleSizes.find(s => s.id === v.size)!.label : '—'} />
+                <SummaryRow label="Make / Model" value={v.makeModel.trim() || '—'} />
                 <SummaryRow label="Package" value={v.pkg ? siteConfig.packages.find(p => p.id === v.pkg)!.name : '—'} />
                 {v.petHair !== null && (
                   <div className="flex justify-between text-xs text-slate-400 pt-1">
@@ -587,7 +621,13 @@ function VehicleCard({
         </div>
       </div>
 
-      {/* Vehicle color / plate */}
+      {/* Make / model, color, plate */}
+      <div>
+        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Vehicle Make &amp; Model *</label>
+        <input value={vehicle.makeModel} onChange={e => onChange({ makeModel: e.target.value })}
+          required placeholder="e.g. 2021 Ford F-150" className={inputClass} style={inputStyle} />
+        <p className="text-xs text-slate-500 mt-1.5">So we know exactly which vehicle to look for.</p>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Vehicle Color</label>
@@ -875,9 +915,9 @@ function StepLabel({ n, label }: { n: number; label: string }) {
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between gap-3">
       <span className="text-slate-500">{label}</span>
-      <span className="text-white font-medium">{value}</span>
+      <span className="text-white font-medium text-right min-w-0 break-words">{value}</span>
     </div>
   )
 }

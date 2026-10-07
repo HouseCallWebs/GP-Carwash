@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
+interface EstimateAddon {
+  label: string
+  price: number
+}
+
 interface EstimateVehicle {
   size:          string
+  makeModel:     string
   pkg:           string
   petHair:       string
-  addons:        string[]
+  basePrice:     number
+  petHairFee:    number
+  addons:        EstimateAddon[]
   vehicleColor?: string
   licensePlate?: string
   subtotal:      number
@@ -49,6 +57,45 @@ interface CustomBody {
 
 type QuoteBody = EstimateBody | RvBoatBody | CustomBody
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+const cellLabel = 'padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;'
+const cellValue = 'padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;'
+const itemLabel = 'padding: 6px 0 6px 14px; color: #94a3b8; font-size: 13px;'
+const itemValue = 'padding: 6px 0; color: #f1f5f9; font-size: 13px; text-align: right;'
+
+function priceBreakdownRows(v: EstimateVehicle): string {
+  const lines: { label: string; amount: string }[] = [
+    { label: `${v.pkg} package — ${v.size}`, amount: `$${v.basePrice}` },
+  ]
+  if (v.petHairFee > 0) {
+    lines.push({ label: 'Pet Hair Fee', amount: `+$${v.petHairFee}` })
+  }
+  for (const a of v.addons) {
+    lines.push({ label: a.label, amount: `+$${a.price}` })
+  }
+  return `
+    <tr>
+      <td style="${cellLabel} border-bottom: none; padding-bottom: 2px;">Price Breakdown</td>
+      <td style="${cellLabel} border-bottom: none; padding-bottom: 2px;"></td>
+    </tr>
+    ${lines.map(l => `
+    <tr>
+      <td style="${itemLabel}">${escapeHtml(l.label)}</td>
+      <td style="${itemValue}">${l.amount}</td>
+    </tr>`).join('')}
+    <tr>
+      <td style="${cellLabel} color: #f1f5f9; font-weight: 700; border-top: 1px solid rgba(255,255,255,0.12);">Subtotal</td>
+      <td style="${cellValue} color: #FF8A3D; font-weight: 700; text-align: right; border-top: 1px solid rgba(255,255,255,0.12);">$${v.subtotal}</td>
+    </tr>`
+}
+
 export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
@@ -81,6 +128,10 @@ export async function POST(req: NextRequest) {
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${v.size}</td>
         </tr>
         <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Make / Model</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${escapeHtml(v.makeModel || '—')}</td>
+        </tr>
+        <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Package</td>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px; font-weight: 600;">${v.pkg}</td>
         </tr>
@@ -90,7 +141,7 @@ export async function POST(req: NextRequest) {
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Add-Ons</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${v.addons.length ? v.addons.join(', ') : 'None'}</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${v.addons.length ? v.addons.map(a => escapeHtml(a.label)).join(', ') : 'None'}</td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Vehicle Color</td>
@@ -100,10 +151,7 @@ export async function POST(req: NextRequest) {
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">License Plate</td>
           <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 14px;">${v.licensePlate || '—'}</td>
         </tr>
-        <tr>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #94a3b8; font-size: 13px;">Subtotal</td>
-          <td style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #FF8A3D; font-size: 14px; font-weight: 700;">$${v.subtotal}</td>
-        </tr>
+        ${priceBreakdownRows(v)}
       `).join('')
 
       detailRows = `

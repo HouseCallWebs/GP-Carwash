@@ -23,6 +23,15 @@ export const siteConfig = {
     giftCardUrl: 'https://squareup.com/gift/HQDD559P065DH/order',
   },
 
+  // Site-wide price increase announcement. Set enabled to false (or delete
+  // this block and its usages) once November 1 has passed.
+  priceIncreaseNotice: {
+    enabled:   true,
+    text:      'Heads up: our prices increase on November 1. Book before then at current rates.',
+    linkLabel: 'Get a quote',
+    linkHref:  '/quote',
+  },
+
   reviews: {
     rating:    4.9,
     count:     '70+',

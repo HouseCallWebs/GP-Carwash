@@ -6,6 +6,7 @@ import { Phone, Menu, X, Gift } from 'lucide-react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import SocialLinks from '@/components/SocialLinks'
+import PriceIncreaseNotice from '@/components/PriceIncreaseNotice'
 import { siteConfig } from '@/lib/config'
 
 const navLinks = [
@@ -33,6 +34,8 @@ export default function Navigation() {
         ? 'bg-dark-900/96 backdrop-blur-md border-b border-white/6 shadow-[0_4px_30px_rgba(0,0,0,0.7)]'
         : 'bg-dark-900/40 backdrop-blur-sm'
     }`}>
+      <PriceIncreaseNotice variant="bar" />
+
       {/* Utility topbar */}
       <div className="border-b border-white/5" style={{ background: 'rgba(0,0,0,0.35)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
