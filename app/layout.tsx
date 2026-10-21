@@ -36,6 +36,8 @@ export const metadata: Metadata = {
 }
 
 const GA4_ID = process.env.NEXT_PUBLIC_GA4_GP_MOBILE
+// Google merged the GA4 ID into this combined Google tag; gtag.js only loads under this ID.
+const GOOGLE_TAG_ID = 'AW-1000029186'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -44,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {GA4_ID && (
           <>
             <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}
+              src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`}
               strategy="afterInteractive"
             />
             <Script id="gtag-init" strategy="afterInteractive">
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
+                gtag('config', '${GOOGLE_TAG_ID}');
                 gtag('config', '${GA4_ID}');
               `}
             </Script>
