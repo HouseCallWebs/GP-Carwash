@@ -16,6 +16,7 @@ const navLinks = [
   { href: '/reviews',  label: 'Reviews' },
   { href: '/about',    label: 'About' },
   { href: '/contact',  label: 'Contact' },
+  { href: '/careers',  label: 'Careers' },
 ]
 
 export default function Navigation() {
@@ -59,34 +60,34 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden xl:flex items-center gap-0.5 2xl:gap-1">
             <Link href="/"
-              className="px-4 py-2.5 text-base font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
+              className="px-3 2xl:px-4 py-2.5 whitespace-nowrap text-base font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
               Home
             </Link>
             {navLinks.map(l => (
               <Link key={l.href} href={l.href}
-                className="px-4 py-2.5 text-base font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
+                className="px-3 2xl:px-4 py-2.5 whitespace-nowrap text-base font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/4">
                 {l.label}
               </Link>
             ))}
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-4">
             <a href={siteConfig.company.phoneHref}
-              className="flex items-center gap-2 text-base font-semibold text-slate-300 hover:text-white transition-colors">
+              className="flex items-center gap-2 whitespace-nowrap text-base font-semibold text-slate-300 hover:text-white transition-colors">
               <Phone className="w-5 h-5" style={{ color: '#FF6A00' }} strokeWidth={2} />
               {siteConfig.company.phone}
             </a>
-            <Link href="/quote" className="btn-orange px-6 py-3 text-base">
+            <Link href="/quote" className="btn-orange px-6 py-3 text-base whitespace-nowrap">
               Get a Quote
             </Link>
           </div>
 
           {/* Mobile hamburger */}
           <button onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden p-2.5 text-slate-400 hover:text-white transition-colors"
+            className="xl:hidden p-2.5 text-slate-400 hover:text-white transition-colors"
             aria-label="Toggle menu">
             {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
@@ -101,7 +102,7 @@ export default function Navigation() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="lg:hidden overflow-hidden bg-dark-850/98 backdrop-blur-md border-b border-white/6"
+            className="xl:hidden overflow-hidden bg-dark-850/98 backdrop-blur-md border-b border-white/6"
           >
             <div className="px-4 py-5 space-y-1.5 max-h-[80vh] overflow-y-auto">
               <Link href="/" onClick={() => setMenuOpen(false)}

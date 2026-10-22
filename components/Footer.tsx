@@ -14,6 +14,7 @@ const quickLinks = [
   { href: '/reviews',  label: 'Reviews'  },
   { href: '/about',    label: 'About'    },
   { href: '/contact',  label: 'Contact'  },
+  { href: '/careers',  label: 'Careers'  },
 ]
 
 export default function Footer() {
