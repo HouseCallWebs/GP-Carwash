@@ -1,14 +1,11 @@
-import { Facebook, Instagram, Youtube, Linkedin, X as XIcon } from 'lucide-react'
+import { Facebook, Youtube } from 'lucide-react'
 import TikTokIcon from '@/components/icons/TikTokIcon'
 import { siteConfig } from '@/lib/config'
 
 const links = [
   { href: siteConfig.social.facebook,  Icon: Facebook,   label: 'Facebook'    },
-  { href: siteConfig.social.instagram, Icon: Instagram,  label: 'Instagram'   },
   { href: siteConfig.social.tiktok,    Icon: TikTokIcon, label: 'TikTok'      },
   { href: siteConfig.social.youtube,   Icon: Youtube,    label: 'YouTube'     },
-  { href: siteConfig.social.x,         Icon: XIcon,      label: 'X (Twitter)' },
-  { href: siteConfig.social.linkedin,  Icon: Linkedin,   label: 'LinkedIn'    },
 ]
 
 interface SocialLinksProps {

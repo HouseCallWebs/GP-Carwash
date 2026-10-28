@@ -1,4 +1,4 @@
-export type VehicleSize = 'small' | 'medium' | 'large'
+export type VehicleSize = 'small' | 'medium' | 'large' | 'xlarge'
 export type PackageTier = 'basic' | 'premium' | 'extreme' | 'interior' | 'buffing'
 
 export const siteConfig = {
@@ -48,6 +48,7 @@ export const siteConfig = {
     { id: 'small',  label: 'Small',  sub: 'Sedan, coupe, hatchback',  image: '/vehicle-sizes/small.jpg'  },
     { id: 'medium', label: 'Medium', sub: '2-Row SUV or crossover',   image: '/vehicle-sizes/medium.jpg' },
     { id: 'large',  label: 'Large',  sub: 'Van, 3-Row SUV, or truck', image: '/vehicle-sizes/large.jpg'  },
+    { id: 'xlarge', label: 'Extra Large', sub: 'Passenger van, more than 3 rows', image: '/vehicle-sizes/xlarge.svg' },
   ] as { id: VehicleSize; label: string; sub: string; image: string }[],
 
   packages: [
@@ -63,7 +64,7 @@ export const siteConfig = {
         'Vacuum floors',
         'Door jambs',
       ],
-      prices: { small: 85, medium: 90, large: 95 },
+      prices: { small: 95, medium: 100, large: 105 },
     },
     {
       id:          'premium',
@@ -79,7 +80,7 @@ export const siteConfig = {
         'Detail rims',
         'Door jambs',
       ],
-      prices: { small: 155, medium: 165, large: 175 },
+      prices: { small: 175, medium: 185, large: 195, xlarge: 235 },
     },
     {
       id:          'extreme',
@@ -95,7 +96,7 @@ export const siteConfig = {
         'Ceiling clean',
         'Trunk by request',
       ],
-      prices: { small: 245, medium: 255, large: 270 },
+      prices: { small: 270, medium: 285, large: 300, xlarge: 340 },
     },
     {
       id:          'interior',
@@ -111,7 +112,7 @@ export const siteConfig = {
         'Clean ceiling',
         'Interior windows',
       ],
-      prices: { small: 195, medium: 205, large: 215 },
+      prices: { small: 220, medium: 230, large: 240, xlarge: 280 },
       popular: true,
     },
     {
@@ -126,14 +127,16 @@ export const siteConfig = {
         '3-step buff the vehicle',
         'Apply sealant to the vehicle',
       ],
-      prices: { small: 250, medium: 300, large: 350 },
+      prices: { small: 280, medium: 330, large: 380 },
     },
   ] as {
     id: PackageTier
     name: string
     description: string
     includes: string[]
-    prices: Record<VehicleSize, number>
+    // Not every package is offered in every size (Extra Large only applies
+    // to Premium, Extreme and Interior).
+    prices: Partial<Record<VehicleSize, number>>
     popular?: boolean
   }[],
 
@@ -174,7 +177,7 @@ export const siteConfig = {
       {
         id:           'boat-basic',
         name:         'Boat Basic Wash & Vacuum',
-        pricePerFoot: 15,
+        pricePerFoot: 20,
         image:        '/rv-boat/boat-basic.jpg',
         includes: [
           'Hand Wash and Dry Exterior',
@@ -187,7 +190,7 @@ export const siteConfig = {
       {
         id:           'boat-interior',
         name:         'Boat Interior Detail & Wash',
-        pricePerFoot: 25,
+        pricePerFoot: 30,
         image:        '/rv-boat/boat-interior.jpg',
         includes: [
           'Hand Wash and Dry Exterior',
@@ -201,7 +204,7 @@ export const siteConfig = {
       {
         id:           'boat-extreme',
         name:         'Boat Extreme Detail',
-        pricePerFoot: 30,
+        pricePerFoot: 35,
         image:        '/rv-boat/boat-extreme.jpg',
         includes: [
           'Hand Wash and Dry Exterior',
@@ -218,7 +221,7 @@ export const siteConfig = {
       {
         id:           'rv-wash',
         name:         'RV Wash',
-        pricePerFoot: 15,
+        pricePerFoot: 20,
         image:        '/rv-boat/rv-wash.jpg',
         includes: [
           'Wash and Dry Exterior',
@@ -230,7 +233,7 @@ export const siteConfig = {
       {
         id:           'rv-wash-wax',
         name:         'RV Wash and Wax',
-        pricePerFoot: 25,
+        pricePerFoot: 30,
         image:        '/rv-boat/rv-wash-wax.jpg',
         includes: [
           'Wash and Dry Exterior',
@@ -244,7 +247,7 @@ export const siteConfig = {
       {
         id:           'rv-exterior',
         name:         'RV Exterior Detail',
-        pricePerFoot: 30,
+        pricePerFoot: 35,
         image:        '/rv-boat/rv-exterior.jpg',
         includes: [
           'Wash and Dry Exterior',
@@ -270,12 +273,8 @@ export const siteConfig = {
 
   social: {
     facebook:  'https://www.facebook.com/GPMobileCarWash1/',
-    instagram: 'https://www.instagram.com/gpmobilecarwash',
     tiktok:    'https://www.tiktok.com/@gpmobilecardetail',
     youtube:   'https://www.youtube.com/@mobilecarwash1',
-    x:         'https://x.com/gpmobilecarwash',
-    linkedin:  'https://www.linkedin.com/in/nelson-orellana-5264a532/',
-    google:    'https://google.com',
   },
 
   seo: {
@@ -287,7 +286,13 @@ export const siteConfig = {
 
 export function getPrice(tier: PackageTier, size: VehicleSize): number {
   const pkg = siteConfig.packages.find(p => p.id === tier)
-  return pkg ? pkg.prices[size] : 0
+  return pkg?.prices[size] ?? 0
+}
+
+// True when the package has a price for the given vehicle size.
+export function isOffered(tier: PackageTier, size: VehicleSize): boolean {
+  const pkg = siteConfig.packages.find(p => p.id === tier)
+  return !!pkg && pkg.prices[size] !== undefined
 }
 
 export type RvBoatCategory = 'boat' | 'rv'

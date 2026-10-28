@@ -8,7 +8,7 @@ import {
   Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle, Store, Truck,
   Anchor, Caravan, Plus, Trash2,
 } from 'lucide-react'
-import { siteConfig, getPrice, getRvBoatTotal, type VehicleSize, type PackageTier, type RvBoatCategory } from '@/lib/config'
+import { siteConfig, getPrice, isOffered, getRvBoatTotal, type VehicleSize, type PackageTier, type RvBoatCategory } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
 type Mode = 'estimate' | 'rvboat' | 'custom'
@@ -155,9 +155,12 @@ function EstimateFlow() {
   const [vehicles, setVehicles] = useState<VehicleConfig[]>(() => {
     const pkgParam  = searchParams.get('pkg')
     const sizeParam = searchParams.get('size')
+    const pkgId  = siteConfig.packages.find(p => p.id === pkgParam)?.id ?? null
+    const sizeId = siteConfig.vehicleSizes.find(s => s.id === sizeParam)?.id ?? null
     return [makeVehicle({
-      pkg:  siteConfig.packages.find(p => p.id === pkgParam)?.id ?? null,
-      size: siteConfig.vehicleSizes.find(s => s.id === sizeParam)?.id ?? null,
+      // Drop a pre-selected package that isn't offered in the pre-selected size
+      pkg:  pkgId && sizeId && !isOffered(pkgId, sizeId) ? null : pkgId,
+      size: sizeId,
     })]
   })
   const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null)
@@ -483,12 +486,15 @@ function VehicleCard({
       {/* Size */}
       <div>
         <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2.5">Vehicle Size</div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {siteConfig.vehicleSizes.map(s => (
             <button
               key={s.id}
               type="button"
-              onClick={() => onChange({ size: s.id })}
+              onClick={() => onChange({
+                size: s.id,
+                ...(vehicle.pkg && !isOffered(vehicle.pkg, s.id) ? { pkg: null } : {}),
+              })}
               className="text-left rounded-xl border overflow-hidden transition-all"
               style={vehicle.size === s.id
                 ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
@@ -499,7 +505,7 @@ function VehicleCard({
                   src={s.image}
                   alt={`${s.label} vehicle size example — ${s.sub}`}
                   fill
-                  sizes="(max-width: 640px) 100vw, 33vw"
+                  sizes="(max-width: 640px) 50vw, 25vw"
                   className="object-contain"
                 />
               </div>
@@ -525,12 +531,14 @@ function VehicleCard({
           {siteConfig.packages.map(p => {
             const price = vehicle.size ? p.prices[vehicle.size] : null
             const selected = vehicle.pkg === p.id
+            const unavailable = !!vehicle.size && p.prices[vehicle.size] === undefined
             return (
               <button
                 key={p.id}
                 type="button"
+                disabled={unavailable}
                 onClick={() => onChange({ pkg: p.id })}
-                className="relative text-left p-4 rounded-xl border transition-all"
+                className={`relative text-left p-4 rounded-xl border transition-all ${unavailable ? 'opacity-40 cursor-not-allowed' : ''}`}
                 style={selected
                   ? { background: 'rgba(255,106,0,0.1)', borderColor: '#FF6A00' }
                   : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
@@ -545,8 +553,8 @@ function VehicleCard({
                   <span className="font-display font-bold text-white uppercase tracking-wide">{p.name}</span>
                   {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
                 </div>
-                <div className="font-display font-bold text-lg" style={{ color: price ? '#FF8A3D' : '#475569' }}>
-                  {price ? `$${price}` : 'Select size'}
+                <div className="font-display font-bold text-lg" style={{ color: price ? '#FF8A3D' : '#475569', ...(unavailable ? { fontSize: '0.8rem' } : {}) }}>
+                  {unavailable ? 'Not offered in this size' : price ? `$${price}` : 'Select size'}
                 </div>
               </button>
             )

@@ -51,7 +51,7 @@ function PackageCard({ pkg, index }: { pkg: Package; index: number }) {
               className="w-full appearance-none pl-3 pr-9 py-2 rounded-lg border text-sm font-semibold text-white outline-none cursor-pointer transition-all focus:border-[#FF6A00]/50"
               style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
             >
-              {siteConfig.vehicleSizes.map(s => (
+              {siteConfig.vehicleSizes.filter(s => pkg.prices[s.id] !== undefined).map(s => (
                 <option key={s.id} value={s.id} style={{ background: '#141414', color: '#fff' }}>
                   {s.label}
                 </option>
@@ -62,7 +62,7 @@ function PackageCard({ pkg, index }: { pkg: Package; index: number }) {
           <div className="text-xs text-slate-500 mb-1">
             {size === 'small' ? 'Starting at' : `${sizeLabel} price`}
           </div>
-          <div className="font-display font-bold text-2xl text-white mb-4">${pkg.prices[size]}</div>
+          <div className="font-display font-bold text-2xl text-white mb-4">${pkg.prices[size] ?? pkg.prices.small}</div>
           <Link href={`/quote?pkg=${pkg.id}&size=${size}`} className="btn-orange w-full py-2.5 text-sm">
             Book This Package
           </Link>
