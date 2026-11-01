@@ -39,8 +39,9 @@ export const siteConfig = {
     { id: 'small',  label: 'Small',  sub: 'Sedan, coupe, hatchback',  image: '/vehicle-sizes/small.jpg'  },
     { id: 'medium', label: 'Medium', sub: '2-Row SUV or crossover',   image: '/vehicle-sizes/medium.jpg' },
     { id: 'large',  label: 'Minivan', sub: 'Minivan, 3-Row SUV, or truck', image: '/vehicle-sizes/large.jpg'  },
-    { id: 'xlarge', label: 'Extra Large', sub: 'Passenger Vans & Dually Trucks', image: '/vehicle-sizes/xlarge.svg' },
-  ] as { id: VehicleSize; label: string; sub: string; image: string }[],
+    { id: 'xlarge', label: 'Extra Large', sub: 'Passenger Vans & Dually Trucks', image: '/vehicle-sizes/xlarge.webp', alt: 'passenger van or dually truck' },
+    // Previous drawing kept at /vehicle-sizes/xlarge.svg in case we revert.
+  ] as { id: VehicleSize; label: string; sub: string; image: string; alt?: string }[],
 
   packages: [
     {

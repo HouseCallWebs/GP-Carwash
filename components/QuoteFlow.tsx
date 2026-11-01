@@ -503,7 +503,7 @@ function VehicleCard({
               <div className="relative aspect-[4/3] bg-black/20">
                 <Image
                   src={s.image}
-                  alt={`${s.label} vehicle size example — ${s.sub}`}
+                  alt={s.alt ?? `${s.label} vehicle size example — ${s.sub}`}
                   fill
                   sizes="(max-width: 640px) 50vw, 25vw"
                   className="object-contain"
