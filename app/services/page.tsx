@@ -36,7 +36,7 @@ export default function ServicesPage() {
           <ScrollReveal delay={0.2}>
             <p className="text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
               Pricing is set by vehicle size — Small (sedan/coupe), Medium (2-row SUV
-              or crossover), Minivan (minivan, 3-row SUV, or truck), and Extra Large (passenger vans and
+              or crossover), Large (minivan, 3-row SUV, or truck), and Extra Large (passenger vans and
               dually trucks, available for Premium, Extreme, and Interior; call for Extra Large
               buffing pricing). Every price below
               applies whether you drop off at our shop or request mobile service —
