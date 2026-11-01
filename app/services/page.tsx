@@ -36,8 +36,9 @@ export default function ServicesPage() {
           <ScrollReveal delay={0.2}>
             <p className="text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
               Pricing is set by vehicle size — Small (sedan/coupe), Medium (2-row SUV
-              or crossover), Large (van, 3-row SUV, or truck), and Extra Large (passenger vans with
-              more than 3 rows of seats, available for Premium, Extreme, and Interior). Every price below
+              or crossover), Minivan (minivan, 3-row SUV, or truck), and Extra Large (passenger vans and
+              dually trucks, available for Premium, Extreme, and Interior; call for Extra Large
+              buffing pricing). Every price below
               applies whether you drop off at our shop or request mobile service —
               same price either way. Pick a package below or build your exact price
               on our{' '}
@@ -79,10 +80,14 @@ export default function ServicesPage() {
                   <div className="p-8 flex flex-col justify-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
                     <div className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Pricing by Size</div>
                     <div className="space-y-3">
-                      {siteConfig.vehicleSizes.filter(s => pkg.prices[s.id] !== undefined).map(s => (
+                      {siteConfig.vehicleSizes
+                        .filter(s => pkg.prices[s.id] !== undefined || pkg.callForPricing?.includes(s.id))
+                        .map(s => (
                         <div key={s.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
                           <span className="text-sm text-slate-400">{s.label}</span>
-                          <span className="font-display font-bold text-xl text-white">${pkg.prices[s.id]}</span>
+                          {pkg.prices[s.id] !== undefined
+                            ? <span className="font-display font-bold text-xl text-white">${pkg.prices[s.id]}</span>
+                            : <span className="text-sm font-semibold" style={{ color: '#FF8A3D' }}>Call for pricing</span>}
                         </div>
                       ))}
                     </div>

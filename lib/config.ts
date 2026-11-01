@@ -38,8 +38,8 @@ export const siteConfig = {
   vehicleSizes: [
     { id: 'small',  label: 'Small',  sub: 'Sedan, coupe, hatchback',  image: '/vehicle-sizes/small.jpg'  },
     { id: 'medium', label: 'Medium', sub: '2-Row SUV or crossover',   image: '/vehicle-sizes/medium.jpg' },
-    { id: 'large',  label: 'Large',  sub: 'Van, 3-Row SUV, or truck', image: '/vehicle-sizes/large.jpg'  },
-    { id: 'xlarge', label: 'Extra Large', sub: 'Passenger van, more than 3 rows', image: '/vehicle-sizes/xlarge.svg' },
+    { id: 'large',  label: 'Minivan', sub: 'Minivan, 3-Row SUV, or truck', image: '/vehicle-sizes/large.jpg'  },
+    { id: 'xlarge', label: 'Extra Large', sub: 'Passenger Vans & Dually Trucks', image: '/vehicle-sizes/xlarge.svg' },
   ] as { id: VehicleSize; label: string; sub: string; image: string }[],
 
   packages: [
@@ -119,6 +119,8 @@ export const siteConfig = {
         'Apply sealant to the vehicle',
       ],
       prices: { small: 280, medium: 330, large: 380 },
+      // Extra Large buffing is quoted by phone, not priced online.
+      callForPricing: ['xlarge'],
     },
   ] as {
     id: PackageTier
@@ -126,8 +128,10 @@ export const siteConfig = {
     description: string
     includes: string[]
     // Not every package is offered in every size (Extra Large only applies
-    // to Premium, Extreme and Interior).
+    // to Premium, Extreme and Interior). Basic is not offered in Extra Large.
     prices: Partial<Record<VehicleSize, number>>
+    // Sizes the package covers but that aren't priced online ("Call for pricing").
+    callForPricing?: VehicleSize[]
     popular?: boolean
   }[],
 
@@ -284,6 +288,13 @@ export function getPrice(tier: PackageTier, size: VehicleSize): number {
 export function isOffered(tier: PackageTier, size: VehicleSize): boolean {
   const pkg = siteConfig.packages.find(p => p.id === tier)
   return !!pkg && pkg.prices[size] !== undefined
+}
+
+// True when the package covers this size but pricing is by call only
+// (e.g. Extra Large buffing). Not bookable online at a price.
+export function isCallForPricing(tier: PackageTier, size: VehicleSize): boolean {
+  const pkg = siteConfig.packages.find(p => p.id === tier)
+  return !!pkg && pkg.prices[size] === undefined && !!pkg.callForPricing?.includes(size)
 }
 
 export type RvBoatCategory = 'boat' | 'rv'

@@ -8,7 +8,7 @@ import {
   Check, Phone, Send, Loader2, CheckCircle, AlertCircle, Sparkles, HelpCircle, Store, Truck,
   Anchor, Caravan, Plus, Trash2,
 } from 'lucide-react'
-import { siteConfig, getPrice, isOffered, getRvBoatTotal, type VehicleSize, type PackageTier, type RvBoatCategory } from '@/lib/config'
+import { siteConfig, getPrice, isOffered, isCallForPricing, getRvBoatTotal, type VehicleSize, type PackageTier, type RvBoatCategory } from '@/lib/config'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
 type Mode = 'estimate' | 'rvboat' | 'custom'
@@ -532,6 +532,7 @@ function VehicleCard({
             const price = vehicle.size ? p.prices[vehicle.size] : null
             const selected = vehicle.pkg === p.id
             const unavailable = !!vehicle.size && p.prices[vehicle.size] === undefined
+            const callForPrice = !!vehicle.size && isCallForPricing(p.id, vehicle.size)
             return (
               <button
                 key={p.id}
@@ -554,7 +555,7 @@ function VehicleCard({
                   {selected && <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#FF6A00' }} />}
                 </div>
                 <div className="font-display font-bold text-lg" style={{ color: price ? '#FF8A3D' : '#475569', ...(unavailable ? { fontSize: '0.8rem' } : {}) }}>
-                  {unavailable ? 'Not offered in this size' : price ? `$${price}` : 'Select size'}
+                  {callForPrice ? 'Call for pricing' : unavailable ? 'Not offered in this size' : price ? `$${price}` : 'Select size'}
                 </div>
               </button>
             )
